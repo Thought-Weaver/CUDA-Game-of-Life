@@ -52,6 +52,19 @@ void print_cells(int width, int height, int* cells) {
 }
 
 int main(int argc, char* argv[]) {
+    // Filename for loading an initial board.
+    std::string filename = "";
+
+    // Parse command line arguments.
+    for (int i = 1; i < argc; ++i) {
+        if (strcmp(argv[i], "--dir") == 0 || strcmp(argv[i], "-d") == 0) {
+            ++i;
+            if (i < argc) {
+                filename = argv[i];
+            }
+        }
+    }
+
     int width = 10, height = 10;
     int initial_state[] = {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
@@ -65,15 +78,19 @@ int main(int argc, char* argv[]) {
         0, 0, 1, 0, 0, 0, 0, 0, 1, 0,
         0, 1, 0, 0, 0, 0, 0, 0, 0, 1
     };
-    Grid grid = Grid(width, height, initial_state);
-    
-    print_cells(width, height, grid.get_cells());
+
+    Grid *grid = new Grid(width, height, initial_state);
+
+    print_cells(width, height, grid->get_cells());
 
     int iterations = 5;
     for (int i = 0; i < iterations; ++i) {
-        grid.naive_cpu_update();
-        print_cells(width, height, grid.get_cells());
+        grid->naive_cpu_update();
+        print_cells(width, height, grid->get_cells());
     }
+
+    delete[] initial_state;
+    delete grid;
 
     return 0;
 }

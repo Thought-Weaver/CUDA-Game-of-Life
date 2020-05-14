@@ -2,8 +2,8 @@
 
 # Input Names
 CUDA_FILES = gol.cu
-CPP_FILES = gol.cpp
-CPP_MAIN = grid.hpp grid.cpp main.cpp
+CPP_FILES = grid.cpp
+CPP_MAIN = main.cpp
 
 # Directory names
 SRCDIR = src
