@@ -89,7 +89,6 @@ int main(int argc, char* argv[]) {
         print_cells(width, height, grid->get_cells());
     }
 
-    delete[] initial_state;
     delete grid;
 
     return 0;
