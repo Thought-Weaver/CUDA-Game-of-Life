@@ -58,8 +58,8 @@ void Grid::naive_cpu_update() {
         for (int j = 0; j < width; ++j) {
             neighbors = count_neighbors(j, i);
             // Any live cell with two or three neighbors survives.
-            if (cells[i * width + j] == 1 && (neighbors < 2 || neighbors > 3)) {
-                updated_cells[i * width + j] = 0;
+            if (cells[i * width + j] == 1 && (neighbors == 2 || neighbors == 3)) {
+                updated_cells[i * width + j] = 1;
             }
             // Any dead cell with three live neighbors comes to life.
             else if (cells[i * width + j] == 0 && neighbors == 3) {
