@@ -11,6 +11,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 
 #include "grid.hpp"
 
@@ -54,14 +55,48 @@ void print_cells(int width, int height, int* cells) {
 
 /* Loads a state of cells from a file. */
 int* load_cells(int width, int height, std::string filename) {
+    // Allocate memory for initial state.
+    int* initial_state = new int[width * height];
 
+    std::ifstream file(filename);
+    std::string line;
+    int i = 0;
+    // Iterate over the lines in the file.
+    while (std::getline(file, line)) {
+        int j = 0;
+
+        // Make sure there aren't more lines than there should be.
+        if (i >= height) {
+            std::cerr << "Error: There were " << i << " or more lines in the "
+                      << "input file, but expected " << height << " lines.";
+            exit(EXIT_FAILURE);
+        } 
+
+        // Make sure that the line length is the same as width.
+        if (line.length() != width) {
+            std::cerr << "Error: Line " << i << " of input file did not have "
+                      << "the correct length (" << width << ")";
+            exit(EXIT_FAILURE);
+        }
+
+        // Iterate over characters in line.
+        for (char& c : line) {
+            // Quick ASCII hack for converting a char to an int.
+            initial_state[i * width + j] = c - '0';
+            j += 1;
+        }
+        i += 1;
+    }
+    file.close();
+    
+    return initial_state;
 }
 
 /* Checks to see that the input arguments are valid. */
 void check_args(int argc, char **argv) {
     #if GPU
         if (argc < 6) {
-            std::cerr << "Incorrect number of arguments." << std::endl;
+            std::cerr << "Error: Incorrect number of arguments." << std::endl;
             std::cerr << "Usage: cpu-gol {width} {height} {iterations} "
                     << "{threads per block} {max num of blocks} -f " 
                     << "{optional input file}" << std::endl;
@@ -69,7 +104,7 @@ void check_args(int argc, char **argv) {
         }
     #else
         if (argc < 4) {
-            std::cerr << "Incorrect number of arguments." << std::endl;
+            std::cerr << "Error: Incorrect number of arguments." << std::endl;
             std::cerr << "Usage: cpu-gol {width} {height} {iterations} -f " 
                     << "{optional input file}" << std::endl;
             exit(EXIT_FAILURE);
