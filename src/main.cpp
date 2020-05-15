@@ -20,8 +20,8 @@ void output_frame(int width, int height, std::string filename, int* cells) {
     output << "P3" << std::endl;
     output << width << " " << height << std::endl;
     output << "255" << std::endl;
-    for (int i = 0; i < width; ++i) {
-        for (int j = 0; j < height; ++j) {
+    for (int i = 0; i < height; ++i) {
+        for (int j = 0; j < width; ++j) {
             if (cells[i * width + j] > 0) {
                 int pixel_value = 255 * cells[i * width + j];
                 output << pixel_value << " " << 
@@ -38,8 +38,8 @@ void output_frame(int width, int height, std::string filename, int* cells) {
 
 // Takes a state of cells and outputs it to standard output.
 void print_cells(int width, int height, int* cells) {
-    for (int i = 0; i < width; ++i) {
-        for (int j = 0; j < height; ++j) {
+    for (int i = 0; i < height; ++i) {
+        for (int j = 0; j < width; ++j) {
             if (cells[i * width + j] == 0) {
                 std::cout << ".";
             }
@@ -72,13 +72,13 @@ int main(int argc, char* argv[]) {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
         0, 0, 1, 0, 0, 0, 0, 0, 1, 0,
         0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 1, 0, 1,
-        0, 0, 0, 0, 0, 0, 0, 0, 1, 0,
-        0, 0, 1, 1, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 1, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
-        0, 0, 1, 0, 0, 0, 0, 0, 1, 0,
-        0, 1, 0, 0, 0, 0, 0, 0, 0, 1
+        1, 0, 0, 0, 0, 0, 0, 1, 0, 1,
+        0, 0, 1, 0, 1, 0, 0, 0, 1, 0,
+        0, 0, 1, 1, 0, 1, 0, 0, 0, 0,
+        0, 0, 0, 0, 1, 0, 1, 0, 0, 0,
+        0, 1, 0, 0, 1, 1, 0, 0, 0, 0,
+        0, 0, 1, 0, 1, 0, 0, 0, 1, 0,
+        0, 1, 0, 0, 0, 1, 1, 0, 0, 1
     };
 
     Grid *grid = new Grid(width, height, initial_state);
