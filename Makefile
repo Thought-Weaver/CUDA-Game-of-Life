@@ -77,21 +77,22 @@ OTHER_GPU_OBJ = $(CPP_OBJ) $(CUDA_OBJ) $(CUDA_OBJ_FILES)
 # Top level rules
 all: cpu-gol gpu-gol
 
-cpu-gol: $(CPU_OBJ) $(OTHER_CPU_OBJ) $(GPP) $(FLAGS) -o $(BINDIR)/$@
+cpu-gol: $(CPU_OBJ) $(OTHER_CPU_OBJ) 
+	$(GPP) $(FLAGS) -o $(BINDIR)/$@ $^
 
 gpu-gol: $(CONV_OBJ) $(OTHER_GPU_OBJ)
 	$(GPP) $(FLAGS) -o $(BINDIR)/$@ $(INCLUDE) $^ $(CUDA_LIBS)
 
 
 # Compile C++ Source Files
-$(CPU_OBJ): $(addprefix $(SRCDIR)/, $(CPP_MAIN))
-	$(GPP) $(FLAGS) -D CPU=1 -c -o $@ $(INCLUDE) $< 
+$(CPU_OBJ): $(addprefix $(SRCDIR)/, $(CPP_MAIN)) 
+	$(GPP) $(FLAGS) -D GPU=0 -c -o $@ $<
 
 $(GPU_OBJ): $(addprefix $(SRCDIR)/, $(CPP_MAIN))
-	$(GPP) $(FLAGS) -D CPU=0 -c -o $@ $(INCLUDE) $< 
+	$(GPP) $(FLAGS) -D GPU=1 -c -o $@ $(INCLUDE) $< 
 
 $(CPP_OBJ): $(OBJDIR)/%.o : $(SRCDIR)/%
-	$(GPP) $(FLAGS) -c -o $@ $(INCLUDE) $<
+	$(GPP) $(FLAGS) -c -o $@ $<
 
 
 # Compile CUDA Source Files

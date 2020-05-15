@@ -49,6 +49,7 @@ void print_cells(int width, int height, int* cells) {
         }
         std::cout << std::endl;
     }
+    std::cout << std::endl;
 }
 
 int main(int argc, char* argv[]) {
@@ -66,7 +67,8 @@ int main(int argc, char* argv[]) {
     }
 
     int width = 10, height = 10;
-    int initial_state[] = {
+    int* initial_state = new int[width * height] 
+    {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
         0, 0, 1, 0, 0, 0, 0, 0, 1, 0,
         0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
@@ -89,6 +91,7 @@ int main(int argc, char* argv[]) {
         print_cells(width, height, grid->get_cells());
     }
 
+    delete[] initial_state;
     delete grid;
 
     return 0;

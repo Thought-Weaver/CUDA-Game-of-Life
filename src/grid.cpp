@@ -12,7 +12,7 @@ Grid::Grid(int width, int height, int* initial_state) {
     // is the correct size.
     cells = new int[width * height];
     for (int i = 0; i < width; ++i) {
-        for (int j = 0; j < height; ++i) {
+        for (int j = 0; j < height; ++j) {
             cells[i * width + j] = initial_state[i * width + j];
         }
     }
