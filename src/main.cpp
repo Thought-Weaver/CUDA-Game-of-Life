@@ -17,8 +17,10 @@
 #include "grid.hpp"
 
 /* Takes a state of cells and outputs it to a PPM file. */
-void output_frame(int width, int height, std::string filename, int* cells) {
-    std::ofstream output((filename + ".ppm").c_str());
+void output_frame(int width, int height, std::string filename, int* cells, 
+                  int iter_num) {
+    std::ofstream output(("./output_frames/" + filename + "_" + 
+                          std::to_string(iter_num) + ".ppm").c_str());
     output << "P3" << std::endl;
     output << width << " " << height << std::endl;
     output << "255" << std::endl;
@@ -136,13 +138,17 @@ void check_args(int argc, char **argv) {
 
 int main(int argc, char** argv) {
     // Filename for loading an initial board.
-    std::string filename = "";
+    std::string in_filename = "";
+    // Base filename for outputting cell frames.
+    std::string out_filename = "";
     // Basic parameters, set to defaults, just in case.
     int iterations = 0, 
         width = 10, 
         height = 10,
         num_threads = 512,
         num_blocks = 200;
+    // Print output boolean option.
+    bool quiet = false;
 
     // Make sure all arguments are valid and that the right number is present.
     check_args(argc, argv);
@@ -158,8 +164,19 @@ int main(int argc, char** argv) {
             if (strcmp(argv[i], "--file") == 0 || strcmp(argv[i], "-f") == 0) {
                 ++i;
                 if (i < argc) {
-                    filename = argv[i];
+                    in_filename = argv[i];
                 }
+            }
+            
+            if (strcmp(argv[i], "--out") == 0 || strcmp(argv[i], "-o") == 0) {
+                ++i;
+                if (i < argc) {
+                    out_filename = argv[i];
+                }
+            }
+
+            if (strcmp(argv[i], "-q") == 0) {
+                quiet = true;
             }
         }
     #else
@@ -170,15 +187,26 @@ int main(int argc, char** argv) {
             if (strcmp(argv[i], "--file") == 0 || strcmp(argv[i], "-f") == 0) {
                 ++i;
                 if (i < argc) {
-                    filename = argv[i];
+                    in_filename = argv[i];
                 }
+            }
+
+            if (strcmp(argv[i], "--out") == 0 || strcmp(argv[i], "-o") == 0) {
+                ++i;
+                if (i < argc) {
+                    out_filename = argv[i];
+                }
+            }
+
+            if (strcmp(argv[i], "-q") == 0) {
+                quiet = true;
             }
         }
     #endif
 
     // If no filename was specified, create a random initial state.
     int* initial_state = new int[width * height];
-    if (filename == "") {
+    if (in_filename == "") {
         // Guarantee random generation.
         srand (time(NULL));
         for (int i = 0; i < height; ++i) {
@@ -188,7 +216,7 @@ int main(int argc, char** argv) {
         }
     }
     else {
-        initial_state = load_cells(width, height, filename);
+        initial_state = load_cells(width, height, in_filename);
     }
 
     // Create grid with initial cell state.
@@ -200,7 +228,14 @@ int main(int argc, char** argv) {
     // Update and print grid.
     for (int i = 0; i < iterations; ++i) {
         grid->naive_cpu_update();
-        print_cells(width, height, grid->get_cells());
+
+        if (!quiet) {
+            print_cells(width, height, grid->get_cells());
+        }
+
+        if (out_filename != "") {
+            output_frame(width, height, out_filename, grid->get_cells(), i);
+        }
     }
 
     // Free memory.
