@@ -13,4 +13,8 @@ __global__ void naive_gol_update_kernel();
 
 __global__ void cuda_optimized_gol_update_kernel();
 
-void call_cuda_gol_update();
+void call_cuda_gol_update(const uint blocks, const uint threads_per_block,
+                          const float *cells, float *out_cells,
+                          bool optimized) {
+    
+}
