@@ -37,24 +37,25 @@ __global__ void naive_update_kernel(int width, int height,
     const uint num_threads_x = blockDim.x * gridDim.x;
     const uint num_threads_y = blockDim.y * gridDim.y;
 
-    uint thread_index_x = blockIdx.x * blockDim.x + threadIdx.x;
-    uint thread_index_y = blockIdx.x * blockDim.x + threadIdx.x;
+    // Thread indices.
+    uint tidx = blockIdx.x * blockDim.x + threadIdx.x;
+    uint tidy = blockIdx.x * blockDim.x + threadIdx.x;
 
-    for (; thread_index_y < height; thread_index_y += num_threads_y) {
-        for (; thread_index_x < width; thread_index_x += num_threads_x) {
-            int neighbors = count_neighbors(thread_index_x, thread_index_y,
-                                            width, height, cells);
+    for (; tidy < height; tidy += num_threads_y) {
+        for (; tidx < width; tidx += num_threads_x) {
+            int neighbors = count_neighbors(tidx, tidy, width, height, cells);
             // Any live cell with two or three neighbors survives.
-            if (cells[i * width + j] == 1 && (neighbors == 2 || neighbors == 3)) {
-                updated_cells[i * width + j] = 1;
+            if (cells[tidy * width + tidx] == 1 && 
+                (neighbors == 2 || neighbors == 3)) {
+                updated_cells[tidy * width + tidx] = 1;
             }
             // Any dead cell with three live neighbors comes to life.
-            else if (cells[i * width + j] == 0 && neighbors == 3) {
-                updated_cells[i * width + j] = 1;
+            else if (cells[tidy * width + tidx] == 0 && neighbors == 3) {
+                updated_cells[tidy * width + tidx] = 1;
             }
             // Any other cells die.
             else {
-                updated_cells[i * width + j] = 0;
+                updated_cells[tidy * width + tidx] = 0;
             }
         }
     }
