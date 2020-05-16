@@ -29,6 +29,7 @@ inline void gpu_assert(cudaError_t code, const char *file, int line,
 }
 
 void call_cuda_gol_update(const uint blocks, const uint threads_per_block,
+                          int width, int height,
                           const float *cells, float *out_cells,
                           bool optimized);
 
