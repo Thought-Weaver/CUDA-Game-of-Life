@@ -10,8 +10,6 @@
 #include <cstdio>
 #include <cstdlib>
 
-#include "cuda_header.cuh"
-
 /*
  * NOTE: You can use this macro to easily check cuda error codes 
  * and get more information. 
