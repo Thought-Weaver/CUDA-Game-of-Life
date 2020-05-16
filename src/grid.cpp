@@ -5,7 +5,7 @@
  */
 
 #include "grid.hpp"
-#include "gol.cuh"
+//#include "gol.cuh"
 
 /* Constructor for the grid. */
 Grid::Grid(int w, int h, int* initial_state) {
@@ -84,12 +84,12 @@ void Grid::naive_cpu_update() {
 
 /* Update the current cells to the next state using a naive GPU method. */
 void Grid::naive_gpu_update() {
-    cuda_call_naive_gol_update_kernel();
+    //cuda_call_naive_gol_update_kernel();
 }
 
 /* Update the current cells to the next state using an optimized GPU method. */
 void Grid::optimized_gpu_update() {
-    cuda_call_optimized_gol_update_kernel();
+    //cuda_call_optimized_gol_update_kernel();
 }
 
 /* Get the current cell state. */
