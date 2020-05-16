@@ -4,6 +4,7 @@
  * @date 5/13/2020
  */
 
+#include <algorithm>
 #include <cassert>
 #include <cstdio>
 #include <cstdlib>
@@ -11,7 +12,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
-#include <sstream>
+#include <time.h>
 
 #include "grid.hpp"
 
@@ -58,24 +59,37 @@ int* load_cells(int width, int height, std::string filename) {
     // Allocate memory for initial state.
     int* initial_state = new int[width * height];
 
-    std::ifstream file(filename);
+    std::ifstream file(filename.c_str());
+
+    // Check to see if file exists.
+    if (!file.good()) {
+        std::cerr << "Error: Input file doesn't exist." << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
     std::string line;
     int i = 0;
     // Iterate over the lines in the file.
     while (std::getline(file, line)) {
         int j = 0;
+        
+        // Strip newline characters.
+        line.erase(std::remove(line.begin(), line.end(), '\n'), line.end());
+        line.erase(std::remove(line.begin(), line.end(), '\r'), line.end());
 
         // Make sure there aren't more lines than there should be.
         if (i >= height) {
-            std::cerr << "Error: There were " << i << " or more lines in the "
-                      << "input file, but expected " << height << " lines.";
+            std::cerr << "Error: There were " << (i + 1) << " or more lines in "
+                      << "the input file, but expected " << height << " lines."
+                      << std::endl;
             exit(EXIT_FAILURE);
         } 
 
         // Make sure that the line length is the same as width.
         if (line.length() != width) {
-            std::cerr << "Error: Line " << i << " of input file did not have "
-                      << "the correct length (" << width << ")";
+            std::cerr << "Error: Line " << i << " of input file had length "
+                      << line.length() << ", but expected a line of length "
+                      << width << "." << std::endl;
             exit(EXIT_FAILURE);
         }
 
@@ -88,6 +102,14 @@ int* load_cells(int width, int height, std::string filename) {
         i += 1;
     }
     file.close();
+
+    // Make sure there aren't fewer lines than there should be.
+    if (i < height) {
+        std::cerr << "Error: There were " << i << " lines in the "
+                    << "input file, but expected " << height << " lines."
+                    << std::endl;
+        exit(EXIT_FAILURE);
+    } 
     
     return initial_state;
 }
@@ -157,6 +179,8 @@ int main(int argc, char** argv) {
     // If no filename was specified, create a random initial state.
     int* initial_state = new int[width * height];
     if (filename == "") {
+        // Guarantee random generation.
+        srand (time(NULL));
         for (int i = 0; i < height; ++i) {
             for (int j = 0; j < width; ++j) {
                 initial_state[i * width + j] = rand() % 2;
