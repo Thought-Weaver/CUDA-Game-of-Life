@@ -222,8 +222,10 @@ int main(int argc, char** argv) {
     // Create grid with initial cell state.
     Grid *grid = new Grid(width, height, initial_state);
 
-    // Show initial state.
-    print_cells(width, height, grid->get_cells());
+    // Show initial state if not in quiet mode.
+    if (!quiet) {
+        print_cells(width, height, grid->get_cells());
+    }
 
     // Update and print grid.
     for (int i = 0; i < iterations; ++i) {
