@@ -28,8 +28,6 @@ inline void gpu_assert(cudaError_t code, const char *file, int line,
     }
 }
 
-void cuda_call_naive_gol_update_kernel();
-
-void cuda_call_optimized_gol_update_kernel();
+void call_cuda_gol_update();
 
 #endif
