@@ -9,6 +9,17 @@
 #include "grid.hpp"
 #include "gol.cuh"
 
+/* Modified from https://bit.ly/365DwFs */
+#define gpuErrchk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
+inline void gpuAssert(cudaError_t code, const char *file, 
+                      int line, bool abort=true) {
+    if (code != cudaSuccess) {
+        fprintf(stderr,"GPUassert: %s %s %d\n", 
+                cudaGetErrorString(code), file, line);
+        exit(code);
+    }
+}
+
 /* Constructor for the grid. */
 Grid::Grid(int w, int h, int* initial_state) {
     // I should probably add some error check that verifies that initial_state
@@ -90,13 +101,16 @@ void Grid::naive_gpu_update(int blocks, int threads_per_block) {
          dev_out_cells;
 
     // Allocate memory for GPU computation.
-    cudaMalloc((void **) &dev_cells, width * height * sizeof(int));
-    cudaMalloc((void **) &dev_out_cells, width * height * sizeof(int));
+    gpuErrchk(cudaMalloc((void **) &dev_cells, 
+        width * height * sizeof(int)));
+    gpuErrchk(cudaMalloc((void **) &dev_out_cells, 
+        width * height * sizeof(int)));
 
     // Copy memory to device.
-    cudaMemcpy(dev_cells, cells, 
-        width * height * sizeof(int), cudaMemcpyHostToDevice);
-    cudaMemset(dev_out_cells, 0, width * height * sizeof(int));
+    gpuErrchk(cudaMemcpy(dev_cells, cells, 
+        width * height * sizeof(int), cudaMemcpyHostToDevice));
+    gpuErrchk(cudaMemset(dev_out_cells, 0, 
+        width * height * sizeof(int)));
 
     call_cuda_gol_update(blocks, threads_per_block, 
                          width, height,
@@ -104,8 +118,8 @@ void Grid::naive_gpu_update(int blocks, int threads_per_block) {
     
     // Copy memory back to host.
     int* updated_cells = new int[width * height];
-    cudaMemcpy(updated_cells, dev_out_cells, 
-            width * height * sizeof(int), cudaMemcpyDeviceToHost);
+    gpuErrchk(cudaMemcpy(updated_cells, dev_out_cells, 
+            width * height * sizeof(int), cudaMemcpyDeviceToHost));
     
     // Now that the next generation has been computed in updated_cells,
     // copy that to the cells in the Grid object.
@@ -122,13 +136,16 @@ void Grid::optimized_gpu_update(int blocks, int threads_per_block) {
          dev_out_cells;
 
     // Allocate memory for GPU computation.
-    cudaMalloc((void **) &dev_cells, width * height * sizeof(int));
-    cudaMalloc((void **) &dev_out_cells, width * height * sizeof(int));
+    gpuErrchk(cudaMalloc((void **) &dev_cells, 
+        width * height * sizeof(int)));
+    gpuErrchk(cudaMalloc((void **) &dev_out_cells, 
+        width * height * sizeof(int)));
 
     // Copy memory to device.
-    cudaMemcpy(dev_cells, cells, 
-        width * height * sizeof(int), cudaMemcpyHostToDevice);
-    cudaMemset(dev_out_cells, 0, width * height * sizeof(int));
+    gpuErrchk(cudaMemcpy(dev_cells, cells, 
+        width * height * sizeof(int), cudaMemcpyHostToDevice));
+    gpuErrchk(cudaMemset(dev_out_cells, 0, 
+        width * height * sizeof(int)));
 
     call_cuda_gol_update(blocks, threads_per_block, 
                          width, height,
@@ -136,8 +153,8 @@ void Grid::optimized_gpu_update(int blocks, int threads_per_block) {
     
     // Copy memory back to host.
     int* updated_cells = new int[width * height];
-    cudaMemcpy(updated_cells, dev_out_cells, 
-            width * height * sizeof(int), cudaMemcpyDeviceToHost);
+    gpuErrchk(cudaMemcpy(updated_cells, dev_out_cells, 
+            width * height * sizeof(int), cudaMemcpyDeviceToHost));
 
     // Now that the next generation has been computed in updated_cells,
     // copy that to the cells in the Grid object.
