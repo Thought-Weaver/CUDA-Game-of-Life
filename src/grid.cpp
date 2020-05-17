@@ -4,6 +4,8 @@
  * @date 5/14/2020
  */
 
+#include <cuda_runtime.h>
+
 #include "grid.hpp"
 #include "gol.cuh"
 
@@ -84,10 +86,26 @@ void Grid::naive_cpu_update() {
 
 /* Update the current cells to the next state using a naive GPU method. */
 void Grid::naive_gpu_update(int blocks, int threads_per_block) {
-    int* updated_cells = new int[width * height];
+    int* dev_cells, 
+         dev_out_cells;
+
+    // Allocate memory for GPU computation.
+    cudaMalloc((void **) &dev_cells, width * height * sizeof(int));
+    cudaMalloc((void **) &dev_out_cells, width * height * sizeof(int));
+
+    // Copy memory to device.
+    cudaMemcpy(dev_cells, cells, 
+        width * height * sizeof(int), cudaMemcpyHostToDevice);
+    cudaMemset(dev_out_cells, 0, width * height * sizeof(int));
+
     call_cuda_gol_update(blocks, threads_per_block, 
                          width, height,
-                         cells, updated_cells, false);
+                         dev_cells, dev_out_cells, false);
+    
+    // Copy memory back to host.
+    int* updated_cells = new int[width * height];
+    cudaMemcpy(updated_cells, dev_out_cells, 
+            width * height * sizeof(int), cudaMemcpyDeviceToHost);
     
     // Now that the next generation has been computed in updated_cells,
     // copy that to the cells in the Grid object.
@@ -100,10 +118,26 @@ void Grid::naive_gpu_update(int blocks, int threads_per_block) {
 
 /* Update the current cells to the next state using an optimized GPU method. */
 void Grid::optimized_gpu_update(int blocks, int threads_per_block) {
-    int* updated_cells = new int[width * height];
+    int* dev_cells, 
+         dev_out_cells;
+
+    // Allocate memory for GPU computation.
+    cudaMalloc((void **) &dev_cells, width * height * sizeof(int));
+    cudaMalloc((void **) &dev_out_cells, width * height * sizeof(int));
+
+    // Copy memory to device.
+    cudaMemcpy(dev_cells, cells, 
+        width * height * sizeof(int), cudaMemcpyHostToDevice);
+    cudaMemset(dev_out_cells, 0, width * height * sizeof(int));
+
     call_cuda_gol_update(blocks, threads_per_block, 
                          width, height,
-                         cells, updated_cells, true);
+                         dev_cells, dev_out_cells, true);
+    
+    // Copy memory back to host.
+    int* updated_cells = new int[width * height];
+    cudaMemcpy(updated_cells, dev_out_cells, 
+            width * height * sizeof(int), cudaMemcpyDeviceToHost);
 
     // Now that the next generation has been computed in updated_cells,
     // copy that to the cells in the Grid object.
