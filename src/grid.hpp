@@ -44,12 +44,12 @@ class Grid {
 
         /* Update the current cells to the next state using a naive GPU method. 
          */
-        void naive_gpu_update();
+        void naive_gpu_update(int blocks, int threads_per_block);
 
         /* Update the current cells to the next state using an optimized GPU 
          * method. 
          */
-        void optimized_gpu_update();
+        void optimized_gpu_update(int blocks, int threads_per_block);
 
         /* Get the current cell state. */
         int* get_cells();

@@ -5,7 +5,7 @@
  */
 
 #include "grid.hpp"
-//#include "gol.cuh"
+#include "gol.cuh"
 
 /* Constructor for the grid. */
 Grid::Grid(int w, int h, int* initial_state) {
@@ -83,13 +83,35 @@ void Grid::naive_cpu_update() {
 }
 
 /* Update the current cells to the next state using a naive GPU method. */
-void Grid::naive_gpu_update() {
-    //cuda_call_naive_gol_update_kernel();
+void Grid::naive_gpu_update(int blocks, int threads_per_block) {
+    int* updated_cells = new int[width * height];
+    call_cuda_gol_update(blocks, threads_per_block, 
+                         width, height,
+                         cells, updated_cells, false);
+    
+    // Now that the next generation has been computed in updated_cells,
+    // copy that to the cells in the Grid object.
+    for (int i = 0; i < height; ++i) {
+        for (int j = 0; j < width; ++j) {
+            cells[i * width + j] = updated_cells[i * width + j];
+        }
+    }
 }
 
 /* Update the current cells to the next state using an optimized GPU method. */
-void Grid::optimized_gpu_update() {
-    //cuda_call_optimized_gol_update_kernel();
+void Grid::optimized_gpu_update(int blocks, int threads_per_block) {
+    int* updated_cells = new int[width * height];
+    call_cuda_gol_update(blocks, threads_per_block, 
+                         width, height,
+                         cells, updated_cells, true);
+
+    // Now that the next generation has been computed in updated_cells,
+    // copy that to the cells in the Grid object.
+    for (int i = 0; i < height; ++i) {
+        for (int j = 0; j < width; ++j) {
+            cells[i * width + j] = updated_cells[i * width + j];
+        }
+    }
 }
 
 /* Get the current cell state. */

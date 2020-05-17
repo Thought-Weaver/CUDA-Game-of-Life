@@ -33,13 +33,13 @@ __host__ __device__ int count_neighbors(int x, int y,
 }
 
 __global__ void naive_update_kernel(int width, int height, 
-                                    float* cells, float* updated_cells) {
-    const uint num_threads_x = blockDim.x * gridDim.x;
-    const uint num_threads_y = blockDim.y * gridDim.y;
+                                    int* cells, int* updated_cells) {
+    const int num_threads_x = blockDim.x * gridDim.x;
+    const int num_threads_y = blockDim.y * gridDim.y;
 
     // Thread indices.
-    uint tidx = blockIdx.x * blockDim.x + threadIdx.x;
-    uint tidy = blockIdx.x * blockDim.x + threadIdx.x;
+    int tidx = blockIdx.x * blockDim.x + threadIdx.x;
+    int tidy = blockIdx.x * blockDim.x + threadIdx.x;
 
     for (; tidy < height; tidy += num_threads_y) {
         for (; tidx < width; tidx += num_threads_x) {
@@ -62,14 +62,17 @@ __global__ void naive_update_kernel(int width, int height,
 }
 
 __global__ void optimized_update_kernel(int width, int height, 
-                                        float* cells, float* updated_cells) {
+                                        int* cells, int* updated_cells) {
 
 }
 
-void call_cuda_gol_update(uint blocks, uint threads_per_block,
+void call_cuda_gol_update(int blocks, int threads_per_block,
                           int width, int height,
-                          float* cells, float* out_cells,
+                          int* cells, int* updated_cells,
                           bool optimized) {
+    // Maybe I should fix these rather than let the user specify them?
+    dim3 blockSize(64, 16);
+    dim3 gridSize(n / 64, n / 64);
     if (optimized) {
         optimized_update_kernel<<<gridSize, blockSize>>>(width, height, 
                                                          cells, updated_cells);
