@@ -71,8 +71,8 @@ void call_cuda_gol_update(int blocks, int threads_per_block,
                           int* cells, int* updated_cells,
                           bool optimized) {
     // Maybe I should fix these rather than let the user specify them?
-    dim3 blockSize(64, 16);
-    dim3 gridSize(n / 64, n / 64);
+    dim3 blockSize(blocks, blocks);
+    dim3 gridSize(width / threads_per_block, height / threads_per_block);
     if (optimized) {
         optimized_update_kernel<<<gridSize, blockSize>>>(width, height, 
                                                          cells, updated_cells);
