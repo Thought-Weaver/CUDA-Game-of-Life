@@ -2,8 +2,8 @@
 
 # Input Names
 CUDA_FILES = gol.cu
-CPP_FILES = utils.cpp grid.cpp testsuite.cpp
-TEST_FILES = utils.cpp grid.cpp testsuite.cpp
+CPP_FILES = gifanim.cpp utils.cpp grid.cpp testsuite.cpp
+TEST_FILES = gifanim.cpp utils.cpp grid.cpp testsuite.cpp
 CPP_MAIN = main.cpp
 
 # Directory names
