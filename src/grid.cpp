@@ -94,7 +94,7 @@ void Grid::naive_cpu_update() {
 }
 
 /* Update the current cells to the next state using a naive GPU method. */
-void Grid::naive_gpu_update(int blocks, int threads_per_block) {
+void Grid::naive_gpu_update(int blocks) {
     int* dev_cells;
     int* dev_out_cells;
 
@@ -111,7 +111,7 @@ void Grid::naive_gpu_update(int blocks, int threads_per_block) {
         width * height * sizeof(int)));
 
     // Update the cells using naive GPU method.
-    call_cuda_gol_update(blocks, threads_per_block, 
+    call_cuda_gol_update(blocks, 
                          width, height,
                          dev_cells, dev_out_cells, false);
     
@@ -130,7 +130,7 @@ void Grid::naive_gpu_update(int blocks, int threads_per_block) {
 }
 
 /* Update the current cells to the next state using an optimized GPU method. */
-void Grid::optimized_gpu_update(int blocks, int threads_per_block) {
+void Grid::optimized_gpu_update(int blocks) {
     int* dev_cells;
     int* dev_out_cells;
 
@@ -147,7 +147,7 @@ void Grid::optimized_gpu_update(int blocks, int threads_per_block) {
         width * height * sizeof(int)));
 
     // Update the cells using optimized GPU method.
-    call_cuda_gol_update(blocks, threads_per_block, 
+    call_cuda_gol_update(blocks, 
                          width, height,
                          dev_cells, dev_out_cells, true);
     

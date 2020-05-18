@@ -11,7 +11,7 @@
 #include <cstdlib>
 #include <cuda_runtime.h>
 
-void call_cuda_gol_update(int blocks, int threads_per_block,
+void call_cuda_gol_update(int blocks,
                           int width, int height,
                           int* cells, int* updated_cells,
                           bool optimized);

@@ -63,17 +63,12 @@ __global__ void optimized_update_kernel(int width, int height,
 
 }
 
-void call_cuda_gol_update(int blocks, int threads_per_block,
+void call_cuda_gol_update(int blocks,
                           int width, int height,
                           int* cells, int* updated_cells,
                           bool optimized) {
     // Maybe I should fix these rather than let the user specify them?
     dim3 block_size(blocks, blocks);
-    // Quick way to make the grid size works regardless of block size.
-    // TODO: Should be using threads_per_block, not blocks, but if I'm
-    // doing it like this, they should be condensed into a single
-    // value -- or removed entirely, not sure I want the user to specify
-    // it.
     dim3 grid_size(int((width + blocks - 1) / blocks), 
                    int((height + blocks - 1) / blocks));
     if (optimized) {

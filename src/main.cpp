@@ -10,11 +10,11 @@
 /* Checks to see that the input arguments are valid. */
 void check_args(int argc, char **argv) {
     #if GPU
-        if (argc < 6) {
+        if (argc < 5) {
             std::cerr << "Error: Incorrect number of arguments." << std::endl;
             std::cerr << "Usage: cpu-gol {width} {height} {iterations} "
-                      << "{threads per block} {max num of blocks} -f " 
-                      << "{optional input file}" << std::endl;
+                      << "{num of blocks} -f {optional input file}" 
+                      << std::endl;
             exit(EXIT_FAILURE);
         }
     #else
@@ -36,8 +36,7 @@ int main(int argc, char** argv) {
     int iterations = 0, 
         width = 10, 
         height = 10,
-        num_threads = 512,
-        num_blocks = 200;
+        num_blocks = 16;
     // Print output boolean option.
     bool quiet = false;
 
@@ -51,9 +50,8 @@ int main(int argc, char** argv) {
         width       = atoi(argv[1]);
         height      = atoi(argv[2]);
         iterations  = atoi(argv[3]);
-        num_threads = atoi(argv[4]);
-        num_blocks  = atoi(argv[5]);
-        for (int i = 6; i < argc; ++i) {
+        num_blocks  = atoi(argv[4]);
+        for (int i = 5; i < argc; ++i) {
             if (strcmp(argv[i], "--file") == 0 || strcmp(argv[i], "-f") == 0) {
                 ++i;
                 if (i < argc) {
@@ -123,7 +121,7 @@ int main(int argc, char** argv) {
     // Update and print grid.
     for (int i = 0; i < iterations; ++i) {
         #if GPU
-            grid->naive_gpu_update(num_blocks, num_threads);
+            grid->naive_gpu_update(num_blocks);
         #else
             grid->naive_cpu_update();
         #endif
