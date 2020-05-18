@@ -210,7 +210,7 @@ void run_grid_update_tests() {
         // Make sure solution matches resulting grid.
         assert(check_equal(width, height, grid->get_cells(), solution_state));
 
-        std::cout << "NAIVE GPU: PASSED" << std::endl;
+        std::cout << "NAIVE GPU: PASSED" << std::endl << std::endl;
 
         // TODO: Add test for optimized GPU update when ready.
 
