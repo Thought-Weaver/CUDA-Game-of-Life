@@ -6,10 +6,7 @@
 
 #include "grid.hpp"
 #include "utils.hpp"
-
-#if TEST
-    #include "testsuite.hpp"
-#endif
+#include "testsuite.hpp"
 
 /* Checks to see that the input arguments are valid. */
 void check_args(int argc, char **argv) {
