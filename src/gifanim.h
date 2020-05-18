@@ -3,6 +3,8 @@
 
 #include <stdlib.h>		// for malloc, calloc, free, memcpy, bzero, integer typedefs
 #include <stdio.h>		// for FILE*
+#include <stdint.h>     // For uint8_t and other types.
+#include <cstring>      // Needed for memcpy.
 
 struct GifPalette
 {

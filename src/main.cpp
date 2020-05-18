@@ -154,7 +154,8 @@ int main(int argc, char** argv) {
 	GifWriter g;
     GifAnim ganim;
     if (out_filename != "") {
-	    ganim.GifBegin(&g, (out_filename + ".gif").c_str(), width, height, delay);
+	    ganim.GifBegin(&g, ("./gifs/" + out_filename + ".gif").c_str(), 
+                       width, height, delay);
     }
 
     // Update and print grid.
@@ -172,7 +173,24 @@ int main(int argc, char** argv) {
         // Write an output frame every iteration.
         if (out_filename != "") {
             //output_frame(width, height, out_filename, grid->get_cells(), i);
-            ganim.GifWriteFrame(&g, grid->get_cells(), width, height, delay);
+            std::vector<uint8_t> frame;
+            for (int i = 0; i < height; ++i) {
+                for (int j = 0; j < width; ++j) {
+                    if (grid->get_cells()[i * width + j] == 0) {
+                        frame.push_back(0);
+                        frame.push_back(0);
+                        frame.push_back(0);
+                        frame.push_back(0);
+                    }
+                    else {
+                        frame.push_back(255);
+                        frame.push_back(255);
+                        frame.push_back(255);
+                        frame.push_back(255);
+                    }
+                }
+            }
+            ganim.GifWriteFrame(&g, frame.data(), width, height, delay);
         }
     }
 
