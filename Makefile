@@ -2,8 +2,7 @@
 
 # Input Names
 CUDA_FILES = gol.cu
-CPP_FILES = utils.cpp grid.cpp
-TEST_FILES = utils.cpp grid.cpp testsuite.cpp
+CPP_FILES = utils.cpp grid.cpp testsuite.cpp
 CPP_MAIN = main.cpp
 
 # Directory names
@@ -63,9 +62,10 @@ CUDA_OBJ_FILES = $(addprefix $(OBJDIR)/, $(addsuffix .o, $(CUDA_FILES)))
 
 # C++ Object Files
 CPP_OBJ = $(addprefix $(OBJDIR)/, $(addsuffix .o, $(CPP_FILES)))
-TEST_OBJ = $(addprefix $(OBJDIR)/, $(addsuffix .o, $(TEST_FILES)))
 CPU_OBJ = $(addprefix $(OBJDIR)/cpu-, $(addsuffix .o, $(CPP_MAIN)))
 GPU_OBJ = $(addprefix $(OBJDIR)/gpu-, $(addsuffix .o, $(CPP_MAIN)))
+
+MAIN_TEST_OBJ = $(addprefix $(OBJDIR)/test-, $(addsuffix .o, $(CPP_MAIN)))
 
 # All other objects that need to be linked in the final executable.
 COMMON_OBJ = $(CPP_OBJ) $(CUDA_OBJ) $(CUDA_OBJ_FILES)
@@ -84,7 +84,7 @@ cpu-gol: $(CPU_OBJ) $(COMMON_OBJ)
 gpu-gol: $(GPU_OBJ) $(COMMON_OBJ)
 	$(GPP) $(FLAGS) -o $(BINDIR)/$@ $(INCLUDE) $^ $(CUDA_LIBS)
 
-test: $(TEST_OBJ) $(COMMON_OBJ)
+test: $(MAIN_TEST_OBJ) $(COMMON_OBJ) 
 	$(GPP) $(FLAGS) -o $(BINDIR)/$@ $(INCLUDE) $^ $(CUDA_LIBS)
 
 
@@ -95,7 +95,7 @@ $(CPU_OBJ): $(addprefix $(SRCDIR)/, $(CPP_MAIN))
 $(GPU_OBJ): $(addprefix $(SRCDIR)/, $(CPP_MAIN))
 	$(GPP) $(FLAGS) -D GPU=1 -D TEST=0 -c -o $@ $(INCLUDE) $< 
 
-$(TEST_OBJ): $(addprefix $(SRCDIR)/, $(CPP_MAIN))
+$(MAIN_TEST_OBJ): $(addprefix $(SRCDIR)/, $(CPP_MAIN))
 	$(GPP) $(FLAGS) -D GPU=1 -D TEST=1 -c -o $@ $(INCLUDE) $< 
 
 $(CPP_OBJ): $(OBJDIR)/%.o : $(SRCDIR)/%

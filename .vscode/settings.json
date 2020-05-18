@@ -44,6 +44,15 @@
         "random": "cpp",
         "sstream": "cpp",
         "filesystem": "cpp",
-        "xlocbuf": "cpp"
+        "xlocbuf": "cpp",
+        "chrono": "cpp",
+        "ctime": "cpp",
+        "iomanip": "cpp",
+        "list": "cpp",
+        "locale": "cpp",
+        "ratio": "cpp",
+        "xlocmes": "cpp",
+        "xlocmon": "cpp",
+        "xloctime": "cpp"
     }
 }
