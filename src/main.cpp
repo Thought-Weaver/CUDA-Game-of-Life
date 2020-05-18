@@ -54,15 +54,14 @@ int main(int argc, char** argv) {
 
     // Make sure all arguments are valid and that the right number is present.
     // TODO: With optional arguments, this makes checking the count impossible.
-    // Need to raise an error if atoi fails?
     check_args(argc, argv);
 
     // Parse command line arguments.
     #if GPU
-        width       = atoi(argv[1]);
-        height      = atoi(argv[2]);
-        iterations  = atoi(argv[3]);
-        num_blocks  = atoi(argv[4]);
+        width       = std::stoi(argv[1]);
+        height      = std::stoi(argv[2]);
+        iterations  = std::stoi(argv[3]);
+        num_blocks  = std::stoi(argv[4]);
         for (int i = 5; i < argc; ++i) {
             if (strcmp(argv[i], "--file") == 0 || strcmp(argv[i], "-f") == 0) {
                 ++i;
@@ -83,9 +82,9 @@ int main(int argc, char** argv) {
             }
         }
     #else
-        width      = atoi(argv[1]);
-        height     = atoi(argv[2]);
-        iterations = atoi(argv[3]);
+        width      = std::stoi(argv[1]);
+        height     = std::stoi(argv[2]);
+        iterations = std::stoi(argv[3]);
         for (int i = 4; i < argc; ++i) {
             if (strcmp(argv[i], "--file") == 0 || strcmp(argv[i], "-f") == 0) {
                 ++i;
