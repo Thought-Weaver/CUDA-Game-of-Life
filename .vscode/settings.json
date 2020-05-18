@@ -42,6 +42,8 @@
         "algorithm": "cpp",
         "*.cuh": "cpp",
         "random": "cpp",
-        "sstream": "cpp"
+        "sstream": "cpp",
+        "filesystem": "cpp",
+        "xlocbuf": "cpp"
     }
 }

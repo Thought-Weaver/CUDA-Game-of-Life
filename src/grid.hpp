@@ -47,6 +47,12 @@ class Grid {
         /* The destructor for Grid. */
         ~Grid();
 
+        /* Get the current cell state. */
+        int* get_cells();
+
+        /* Sets cells to another state of cells. */
+        void set_cells(int* other_cells);
+
         /* Update the current cells to the next state using a naive CPU method. 
          */
         void naive_cpu_update();
@@ -59,9 +65,6 @@ class Grid {
          * method. 
          */
         void optimized_gpu_update(int blocks);
-
-        /* Get the current cell state. */
-        int* get_cells();
 };
 
 #endif

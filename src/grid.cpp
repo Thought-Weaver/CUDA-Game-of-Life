@@ -34,7 +34,21 @@ Grid::Grid(int w, int h, int* initial_state) {
 
 /* Destructor for the grid. */
 Grid::~Grid() {
+    delete[] cells;
+}
 
+/* Get the current cell state. */
+int* Grid::get_cells() {
+    return cells;
+}
+
+/* Sets cells to another state of cells. */
+void Grid::set_state(int* other_cells) {
+    for (int i = 0; i < height; ++i) {
+        for (int j = 0; j < width; ++j) {
+            cells[i * width + j] = other_cells[i * width + j];
+        }
+    }
 }
 
 /* Counts the living neighbors of a cell. */
@@ -86,11 +100,10 @@ void Grid::naive_cpu_update() {
     
     // Now that the next generation has been computed in updated_cells,
     // copy that to the cells in the Grid object.
-    for (int i = 0; i < height; ++i) {
-        for (int j = 0; j < width; ++j) {
-            cells[i * width + j] = updated_cells[i * width + j];
-        }
-    }
+    set_state(updated_cells);
+
+    // Free memory.
+    delete[] updated_cells;
 }
 
 /* Update the current cells to the next state using a naive GPU method. */
@@ -122,11 +135,13 @@ void Grid::naive_gpu_update(int blocks) {
     
     // Now that the next generation has been computed in updated_cells,
     // copy that to the cells in the Grid object.
-    for (int i = 0; i < height; ++i) {
-        for (int j = 0; j < width; ++j) {
-            cells[i * width + j] = updated_cells[i * width + j];
-        }
-    }
+    set_state(updated_cells);
+
+    // Free memory.
+    cuda_free(dev_cells);
+    cuda_free(dev_out_cells);
+
+    delete[] updated_cells;
 }
 
 /* Update the current cells to the next state using an optimized GPU method. */
@@ -158,14 +173,11 @@ void Grid::optimized_gpu_update(int blocks) {
 
     // Now that the next generation has been computed in updated_cells,
     // copy that to the cells in the Grid object.
-    for (int i = 0; i < height; ++i) {
-        for (int j = 0; j < width; ++j) {
-            cells[i * width + j] = updated_cells[i * width + j];
-        }
-    }
-}
+    set_state(updated_cells);
 
-/* Get the current cell state. */
-int* Grid::get_cells() {
-    return cells;
+    // Free memory.
+    cuda_free(dev_cells);
+    cuda_free(dev_out_cells);
+    
+    delete[] updated_cells;
 }
