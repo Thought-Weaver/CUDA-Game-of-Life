@@ -7,7 +7,7 @@
 #include "testsuite.hpp"
 
 /* Checks to see if two cell states are equal. */
-bool check_equal(int width, int height, int* cells, int* other_cells) {
+bool check_equal(int width, int height, uint8_t* cells, uint8_t* other_cells) {
     for (int i = 0; i < height; ++i) {
         for (int j = 0; j < width; ++j) {
             if (cells[i * width + j] != other_cells[i * width + j]) {
@@ -20,7 +20,7 @@ bool check_equal(int width, int height, int* cells, int* other_cells) {
 
 /* Run a series of comprehensive tests on IO utilities. */
 void run_io_tests() {
-    int* result_1 = new int[10 * 10] {
+    uint8_t* result_1 = new uint8_t[10 * 10] {
         0,0,1,0,0,0,0,0,0,0,
         1,0,1,0,0,0,0,0,0,0,
         0,1,1,0,0,0,0,0,0,0,
@@ -33,7 +33,7 @@ void run_io_tests() {
         0,0,0,0,0,0,0,0,0,0
     };
 
-    int* result_2 = new int[17 * 15] {
+    uint8_t* result_2 = new uint8_t[17 * 15] {
         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
         0,0,0,0,1,1,1,0,0,0,1,1,1,0,0,0,0,
         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -51,7 +51,7 @@ void run_io_tests() {
         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
     };
 
-    int* result_3 = new int[30 * 20] {
+    uint8_t* result_3 = new uint8_t[30 * 20] {
         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -74,9 +74,9 @@ void run_io_tests() {
         0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
     };
 
-    int* glider = load_cells(10, 10, "./grids/10x10_Glider.txt");
-    int* pulsar = load_cells(17, 15, "./grids/17x15_Pulsar.txt");
-    int* puffer = load_cells(30, 20, "./grids/30x20_Puffer1.txt");
+    uint8_t* glider = load_cells(10, 10, "./grids/10x10_Glider.txt");
+    uint8_t* pulsar = load_cells(17, 15, "./grids/17x15_Pulsar.txt");
+    uint8_t* puffer = load_cells(30, 20, "./grids/30x20_Puffer1.txt");
     
     std::cout << "=================================" << std::endl
               << "IO TESTS:" << std::endl
@@ -113,13 +113,13 @@ void run_io_tests() {
 
 /* Run a series of comprehensive tests on other Grid functions. */
 void run_other_grid_tests() {
-    int* test_state_1 = new int[3 * 4] {
+    uint8_t* test_state_1 = new uint8_t[3 * 4] {
         0, 0, 0,
         1, 0, 1,
         0, 1, 0
     };
 
-    int* test_state_2 = new int[3 * 4] {
+    uint8_t* test_state_2 = new uint8_t[3 * 4] {
         0, 1, 0,
         1, 1, 1,
         0, 1, 0
@@ -180,9 +180,9 @@ void run_grid_update_tests() {
         int height = atoi(split_str[1].c_str());
         int iterations = atoi(split_str[2].c_str());
 
-        int* initial_state = load_cells(width, height, 
+        uint8_t* initial_state = load_cells(width, height, 
                                         "./tests/inputs/" + base_file);
-        int* solution_state = load_cells(width, height, 
+        uint8_t* solution_state = load_cells(width, height, 
                                          "./tests/solutions/" + base_file);
 
         Grid* grid = new Grid(width, height, initial_state);

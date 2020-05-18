@@ -26,13 +26,13 @@ class Grid {
         // memory? It's potentially good for interactive visualization, but
         // this project likely won't support that. I could argue the case for
         // future development, though.
-        std::vector<int*> history;
+        std::vector<uint8_t*> history;
 
         /* A 2D array of size width x height containing a 0 in index i, j if
          * the cell is dead and a 1 if it's alive. This is the current state
          * of the grid.
          */
-        int* cells;
+        uint8_t* cells;
 
         /* The width and height of the grid. */
         int width, height;
@@ -42,16 +42,16 @@ class Grid {
 
     public:
         /* The constructor for Grid. */
-        Grid(int width, int height, int* initial_state);
+        Grid(int width, int height, uint8_t* initial_state);
 
         /* The destructor for Grid. */
         ~Grid();
 
         /* Get the current cell state. */
-        int* get_cells();
+        uint8_t* get_cells();
 
         /* Sets cells to another state of cells. */
-        void set_cells(int* other_cells);
+        void set_cells(uint8_t* other_cells);
 
         /* Update the current cells to the next state using a naive CPU method. 
          */

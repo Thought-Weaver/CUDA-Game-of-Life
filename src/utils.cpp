@@ -6,8 +6,21 @@
 
 #include "utils.hpp"
 
+/* Takes a vector of cells and outputs it into a GIF. */
+void output_gif(int width, int height, std::string filename, 
+                std::vector<uint8_t*> history) {
+	int delay = 100;
+	GifWriter g;
+	GifBegin(&g, (filename + ".gif").c_str(), width, height, delay);
+    for (auto& cells : history) {
+        GifWriteFrame(&g, cells, width, height, delay);
+    }
+	GifEnd(&g);
+}
+
+
 /* Takes a state of cells and outputs it to a PPM file. */
-void output_frame(int width, int height, std::string filename, int* cells, 
+void output_frame(int width, int height, std::string filename, uint8_t* cells, 
                   int iter_num) {
     std::ofstream output(("./output_frames/" + filename + "_" + 
                           std::to_string(iter_num) + ".ppm").c_str());
@@ -17,7 +30,7 @@ void output_frame(int width, int height, std::string filename, int* cells,
     for (int i = 0; i < height; ++i) {
         for (int j = 0; j < width; ++j) {
             if (cells[i * width + j] > 0) {
-                int pixel_value = 255 * cells[i * width + j];
+                uint8_t pixel_value = 255 * cells[i * width + j];
                 output << pixel_value << " " << 
                           pixel_value << " " << 
                           pixel_value << " " << std::endl;
@@ -31,7 +44,7 @@ void output_frame(int width, int height, std::string filename, int* cells,
 }
 
 /* Takes a state of cells and outputs it to standard output. */
-void print_cells(int width, int height, int* cells) {
+void print_cells(int width, int height, uint8_t* cells) {
     for (int i = 0; i < height; ++i) {
         for (int j = 0; j < width; ++j) {
             if (cells[i * width + j] == 0) {
@@ -47,9 +60,9 @@ void print_cells(int width, int height, int* cells) {
 }
 
 /* Loads a state of cells from a file. */
-int* load_cells(int width, int height, std::string filename) {
+uint8_t* load_cells(int width, int height, std::string filename) {
     // Allocate memory for initial state.
-    int* initial_state = new int[width * height];
+    uint8_t* initial_state = new uint8_t[width * height];
 
     std::ifstream file(filename.c_str());
 

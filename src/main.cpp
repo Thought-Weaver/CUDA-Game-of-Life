@@ -127,7 +127,7 @@ int main(int argc, char** argv) {
     #endif
 
     // If no filename was specified, create a random initial state.
-    int* initial_state = new int[width * height];
+    uint8_t* initial_state = new int[width * height];
     if (in_filename == "") {
         // Guarantee random generation.
         srand (time(NULL));
@@ -149,6 +149,13 @@ int main(int argc, char** argv) {
         print_cells(width, height, grid->get_cells());
     }
 
+    // Parameters for GIF output.
+    int delay = 100;
+	GifWriter g;
+    if (out_filename != "") {
+	    GifBegin(&g, (out_filename + ".gif").c_str(), width, height, delay);
+    }
+
     // Update and print grid.
     for (int i = 0; i < iterations; ++i) {
         #if GPU
@@ -161,9 +168,16 @@ int main(int argc, char** argv) {
             print_cells(width, height, grid->get_cells());
         }
 
+        // Write an output frame every iteration.
         if (out_filename != "") {
-            output_frame(width, height, out_filename, grid->get_cells(), i);
+            //output_frame(width, height, out_filename, grid->get_cells(), i);
+            GifWriteFrame(&g, grid->get_cells(), width, height, delay);
         }
+    }
+
+    // Close and write the GIF.
+    if (out_filename != "") {
+        GifEnd(&g);
     }
 
     // Free memory.
