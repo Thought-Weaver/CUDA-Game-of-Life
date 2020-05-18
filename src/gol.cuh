@@ -9,6 +9,8 @@
 
 #include <cstdio>
 #include <cstdlib>
+
+#include <stdint.h>
 #include <cuda_runtime.h>
 
 void call_cuda_gol_update(int blocks,

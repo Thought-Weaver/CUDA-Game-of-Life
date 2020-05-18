@@ -17,6 +17,8 @@
 #include <fstream>
 #include <vector>
 
+#include <stdint.h>
+
 #include "gif.h"
 
 /* Takes a state of cells and outputs it to a PPM file. */

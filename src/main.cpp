@@ -127,7 +127,7 @@ int main(int argc, char** argv) {
     #endif
 
     // If no filename was specified, create a random initial state.
-    uint8_t* initial_state = new int[width * height];
+    uint8_t* initial_state = new uint8_t[width * height];
     if (in_filename == "") {
         // Guarantee random generation.
         srand (time(NULL));

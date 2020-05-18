@@ -15,8 +15,10 @@
 #include <string>
 #include <iostream>
 #include <fstream>
-#include <time.h>
 #include <vector>
+
+#include <stdint.h>
+#include <time.h>
 
 class Grid {
     private:
