@@ -65,7 +65,7 @@ int main(int argc, char** argv) {
             num_blocks  = std::stoi(argv[4]);
         }
         catch(std::exception const& e) {
-            std::cout << "Error: " << e.what() << std::endl;
+            std::cerr << "Error: " << e.what() << std::endl;
         }
 
         for (int i = 5; i < argc; ++i) {
@@ -94,7 +94,7 @@ int main(int argc, char** argv) {
             iterations  = std::stoi(argv[3]);
         }
         catch(std::exception const& e) {
-            std::cout << "Error: " << e.what() << std::endl;
+            std::cerr << "Error: " << e.what() << std::endl;
         }
 
         for (int i = 4; i < argc; ++i) {
