@@ -13,7 +13,7 @@
 
 void call_cuda_gol_update(int blocks,
                           int width, int height,
-                          int* cells, int* updated_cells,
+                          uint8_t* cells, uint8_t* updated_cells,
                           bool optimized);
 
 #endif

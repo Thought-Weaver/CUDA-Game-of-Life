@@ -9,7 +9,7 @@
 // What if I just passed the grid instead?
 __host__ __device__ int count_neighbors(int x, int y, 
                                         int width, int height, 
-                                        int* cells) {
+                                        uint8_t* cells) {
     int alive = 0;
     
     if (x < 0 || x >= width || y < 0 || y >= height) {
@@ -30,7 +30,7 @@ __host__ __device__ int count_neighbors(int x, int y,
 }
 
 __global__ void naive_update_kernel(int width, int height, 
-                                    int* cells, int* updated_cells) {
+                                    uint8_t* cells, uint8_t* updated_cells) {
     const int num_threads_x = blockDim.x * gridDim.x;
     const int num_threads_y = blockDim.y * gridDim.y;
 
@@ -59,13 +59,13 @@ __global__ void naive_update_kernel(int width, int height,
 }
 
 __global__ void optimized_update_kernel(int width, int height, 
-                                        int* cells, int* updated_cells) {
+                                        uint8_t* cells, uint8_t* updated_cells) {
 
 }
 
 void call_cuda_gol_update(int blocks,
                           int width, int height,
-                          int* cells, int* updated_cells,
+                          uint8_t* cells, uint8_t* updated_cells,
                           bool optimized) {
     // Maybe I should fix these rather than let the user specify them?
     dim3 block_size(blocks, blocks);
