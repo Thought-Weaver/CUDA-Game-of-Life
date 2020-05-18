@@ -79,7 +79,7 @@ ALL_TEST_OBJ = $(TEST_OBJ) $(CUDA_OBJ) $(CUDA_OBJ_FILES)
 # ------------------------------------------------------------------------------
 
 # Top level rules
-all: cpu-gol gpu-gol
+all: cpu-gol gpu-gol test
 
 cpu-gol: $(CPU_OBJ) $(COMMON_OBJ) 
 	$(GPP) $(FLAGS) -o $(BINDIR)/$@ $(INCLUDE) $^ $(CUDA_LIBS)
