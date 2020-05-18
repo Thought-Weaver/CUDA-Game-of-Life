@@ -40,6 +40,8 @@
         "xtr1common": "cpp",
         "xutility": "cpp",
         "algorithm": "cpp",
-        "*.cuh": "cpp"
+        "*.cuh": "cpp",
+        "random": "cpp",
+        "sstream": "cpp"
     }
 }

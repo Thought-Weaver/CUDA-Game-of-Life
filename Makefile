@@ -2,7 +2,7 @@
 
 # Input Names
 CUDA_FILES = gol.cu
-CPP_FILES = grid.cpp
+CPP_FILES = utils.cpp grid.cpp
 CPP_MAIN = main.cpp
 
 # Directory names

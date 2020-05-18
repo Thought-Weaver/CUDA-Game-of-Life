@@ -7,14 +7,16 @@
 #ifndef GRID_H
 #define GRID_H
 
+#include <algorithm>
 #include <cassert>
 #include <cstdio>
 #include <cstdlib>
-#include <cmath>
 #include <cstring>
-#include <vector>
-#include <fstream>
+#include <string>
 #include <iostream>
+#include <fstream>
+#include <time.h>
+#include <vector>
 
 class Grid {
     private:
