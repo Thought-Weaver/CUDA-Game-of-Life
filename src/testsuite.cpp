@@ -9,7 +9,6 @@
 using dir_it = std::filesystem::directory_iterator;
 
 /* Checks to see if two cell states are equal. */
-// Should this be part of the Grid class?
 bool check_equal(int width, int height, int* cells, int* other_cells) {
     for (int i = 0; i < height; ++i) {
         for (int j = 0; j < width; ++j) {
@@ -126,6 +125,7 @@ void run_other_grid_tests() {
     // Free memory.
     delete[] test_state_1;
     delete[] test_state_2;
+    delete grid;
 }
 
 /* Run a series of comprehensive tests on Grid update methods. */

@@ -65,6 +65,23 @@ class Grid {
          * method. 
          */
         void optimized_gpu_update(int blocks);
+
+        /* Operator overload for comparing two grids. */
+        bool operator==(const Grid& g) {
+            if (g.width != width || g.height != height) {
+                return false;
+            }
+
+            for (int i = 0; i < height; ++i) {
+                for (int j = 0; j < width; ++j) {
+                    if (cells[i * width + j] != g.cells[i * width + j]) {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
 };
 
 #endif
