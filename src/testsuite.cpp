@@ -6,8 +6,6 @@
 
 #include "testsuite.hpp"
 
-using dir_it = std::filesystem::directory_iterator;
-
 /* Checks to see if two cell states are equal. */
 bool check_equal(int width, int height, int* cells, int* other_cells) {
     for (int i = 0; i < height; ++i) {
@@ -130,17 +128,20 @@ void run_other_grid_tests() {
 
 /* Run a series of comprehensive tests on Grid update methods. */
 void run_grid_update_tests() {
+    // Wanted to use filesystem, but Titan doesn't have C++17. :(
+    std::string base_files[4] = {
+        "10_10_1_Glider.txt",
+        "10_10_2_Glider.txt",
+        "10_10_3_Glider.txt",
+        "10_10_4_Glider.txt"
+    };
+
     // Iterate over all of the tests in the folder.
-    for (const auto& p : dir_it("./tests/inputs")) {
+    for (const auto& base_file : base_files) {
         // Temp string for storing substrings split by delimeter.
         std::string s;
-        // String of path to current test file.
-        std::string path_str = std::string(p.path().u8string());
-        // String of base test filename.
-        std::string base_filename = 
-            path_str.substr(path_str.find_last_of("/\\") + 1);
         // Stringstream for splitting the filename.
-        std::stringstream path_ss = std::stringstream(base_filename);
+        std::stringstream path_ss = std::stringstream(base_file);
         // Resulting vector of substrings split by delimeter.
         std::vector<std::string> split_str;
 
@@ -153,9 +154,10 @@ void run_grid_update_tests() {
         int height = atoi(split_str[1].c_str());
         int iterations = atoi(split_str[2].c_str());
 
-        int* initial_state = load_cells(width, height, path_str);
+        int* initial_state = load_cells(width, height, 
+                                        "./tests/inputs/" + base_file);
         int* solution_state = load_cells(width, height, 
-                                         "./tests/solutions/" + base_filename);
+                                         "./tests/solutions/" + base_file);
 
         Grid* grid = new Grid(width, height, initial_state);
 

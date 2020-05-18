@@ -43,7 +43,7 @@ int* Grid::get_cells() {
 }
 
 /* Sets cells to another state of cells. */
-void Grid::set_state(int* other_cells) {
+void Grid::set_cells(int* other_cells) {
     for (int i = 0; i < height; ++i) {
         for (int j = 0; j < width; ++j) {
             cells[i * width + j] = other_cells[i * width + j];
@@ -100,7 +100,7 @@ void Grid::naive_cpu_update() {
     
     // Now that the next generation has been computed in updated_cells,
     // copy that to the cells in the Grid object.
-    set_state(updated_cells);
+    set_cells(updated_cells);
 
     // Free memory.
     delete[] updated_cells;
@@ -135,11 +135,11 @@ void Grid::naive_gpu_update(int blocks) {
     
     // Now that the next generation has been computed in updated_cells,
     // copy that to the cells in the Grid object.
-    set_state(updated_cells);
+    set_cells(updated_cells);
 
     // Free memory.
-    cuda_free(dev_cells);
-    cuda_free(dev_out_cells);
+    cudaFree(dev_cells);
+    cudaFree(dev_out_cells);
 
     delete[] updated_cells;
 }
@@ -173,11 +173,11 @@ void Grid::optimized_gpu_update(int blocks) {
 
     // Now that the next generation has been computed in updated_cells,
     // copy that to the cells in the Grid object.
-    set_state(updated_cells);
+    set_cells(updated_cells);
 
     // Free memory.
-    cuda_free(dev_cells);
-    cuda_free(dev_out_cells);
+    cudaFree(dev_cells);
+    cudaFree(dev_out_cells);
     
     delete[] updated_cells;
 }

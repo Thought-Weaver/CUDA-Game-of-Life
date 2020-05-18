@@ -27,7 +27,7 @@ else
 	NVCC_FLAGS := -m64
 endif
 
-NVCC_FLAGS += -g -dc -Wno-deprecated-gpu-targets --std=c++17 \
+NVCC_FLAGS += -g -dc -Wno-deprecated-gpu-targets --std=c++11 \
 	      --expt-relaxed-constexpr
 NVCC_INCLUDE =
 NVCC_CUDA_LIBS = 
@@ -88,13 +88,13 @@ test: $(TEST_OBJ) $(COMMON_OBJ)
 
 # Compile C++ Source Files
 $(CPU_OBJ): $(addprefix $(SRCDIR)/, $(CPP_MAIN)) 
-	$(GPP) $(FLAGS) -D GPU=0 TEST=0 -c -o $@ $(INCLUDE) $<
+	$(GPP) $(FLAGS) -D GPU=0 -D TEST=0 -c -o $@ $(INCLUDE) $<
 
 $(GPU_OBJ): $(addprefix $(SRCDIR)/, $(CPP_MAIN))
-	$(GPP) $(FLAGS) -D GPU=1 TEST=0 -c -o $@ $(INCLUDE) $< 
+	$(GPP) $(FLAGS) -D GPU=1 -D TEST=0 -c -o $@ $(INCLUDE) $< 
 
 $(TEST_OBJ): $(addprefix $(SRCDIR)/, $(CPP_MAIN))
-	$(GPP) $(FLAGS) -D GPU=1 TEST=1 -c -o $@ $(INCLUDE) $< 
+	$(GPP) $(FLAGS) -D GPU=1 -D TEST=1 -c -o $@ $(INCLUDE) $< 
 
 $(CPP_OBJ): $(OBJDIR)/%.o : $(SRCDIR)/%
 	$(GPP) $(FLAGS) -c -o $@ $<
