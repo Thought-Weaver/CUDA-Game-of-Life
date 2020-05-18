@@ -21,6 +21,14 @@
 
 #include "gifanim.h"
 
+/* Takes an array of cells and writes it as a GIF frame. */
+void output_gif_frame(int width, int height, uint8_t* cells, 
+                      GifWriter* g, GifAnim* ganim, int delay);
+
+/* Takes a vector of cells and outputs it into a GIF. */
+void output_gif(int width, int height, std::string filename, 
+                std::vector<uint8_t*> history);
+
 /* Takes a state of cells and outputs it to a PPM file. */
 void output_frame(int width, int height, std::string filename, uint8_t* cells, 
                   int iter_num);

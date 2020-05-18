@@ -6,6 +6,29 @@
 
 #include "utils.hpp"
 
+/* Takes an array of cells and writes it as a GIF frame. */
+void output_gif_frame(int width, int height, uint8_t* cells, 
+                      GifWriter* g, GifAnim* ganim, int delay) {
+    std::vector<uint8_t> frame;
+    for (int i = 0; i < height; ++i) {
+        for (int j = 0; j < width; ++j) {
+            if (cells[i * width + j] == 0) {
+                frame.push_back(0);
+                frame.push_back(0);
+                frame.push_back(0);
+                frame.push_back(0);
+            }
+            else {
+                frame.push_back(255);
+                frame.push_back(255);
+                frame.push_back(255);
+                frame.push_back(255);
+            }
+        }
+    }
+    ganim->GifWriteFrame(g, frame.data(), width, height, delay);
+}
+
 /* Takes a vector of cells and outputs it into a GIF. */
 void output_gif(int width, int height, std::string filename, 
                 std::vector<uint8_t*> history) {
@@ -14,11 +37,10 @@ void output_gif(int width, int height, std::string filename,
 	GifWriter g;
 	ganim.GifBegin(&g, (filename + ".gif").c_str(), width, height, delay);
     for (auto& cells : history) {
-        ganim.GifWriteFrame(&g, cells, width, height, delay);
+        output_gif_frame(width, height, cells, &g, &ganim, delay);
     }
 	ganim.GifEnd(&g);
 }
-
 
 /* Takes a state of cells and outputs it to a PPM file. */
 void output_frame(int width, int height, std::string filename, uint8_t* cells, 
