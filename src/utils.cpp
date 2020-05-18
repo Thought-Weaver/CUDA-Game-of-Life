@@ -35,7 +35,8 @@ void output_gif(int width, int height, std::string filename,
 	int delay = 100;
     GifAnim ganim;
 	GifWriter g;
-	ganim.GifBegin(&g, (filename + ".gif").c_str(), width, height, delay);
+	ganim.GifBegin(&g, ("./gifs/" + filename + ".gif").c_str(), 
+                   width, height, delay);
     for (auto& cells : history) {
         output_gif_frame(width, height, cells, &g, &ganim, delay);
     }
