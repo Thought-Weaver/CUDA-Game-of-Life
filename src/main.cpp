@@ -7,6 +7,10 @@
 #include "grid.hpp"
 #include "utils.hpp"
 
+#if TEST
+#include "testsuite.hpp"
+#endif
+
 /* Checks to see that the input arguments are valid. */
 void check_args(int argc, char **argv) {
     #if GPU
@@ -28,6 +32,14 @@ void check_args(int argc, char **argv) {
 }
 
 int main(int argc, char** argv) {
+    // If we're in testing mode, run tests and skip everything else.
+    #if TEST
+        run_io_tests();
+        run_other_grid_tests();
+        run_grid_update_tests();
+        exit(EXIT_SUCCESS);
+    #endif
+
     // Filename for loading an initial board.
     std::string in_filename = "";
     // Base filename for outputting cell frames.
