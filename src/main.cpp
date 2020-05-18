@@ -58,10 +58,16 @@ int main(int argc, char** argv) {
 
     // Parse command line arguments.
     #if GPU
-        width       = std::stoi(argv[1]);
-        height      = std::stoi(argv[2]);
-        iterations  = std::stoi(argv[3]);
-        num_blocks  = std::stoi(argv[4]);
+        try {
+            width       = std::stoi(argv[1]);
+            height      = std::stoi(argv[2]);
+            iterations  = std::stoi(argv[3]);
+            num_blocks  = std::stoi(argv[4]);
+        }
+        catch(std::exception const& e) {
+            std::cout << "Error: " << e.what() << std::endl;
+        }
+
         for (int i = 5; i < argc; ++i) {
             if (strcmp(argv[i], "--file") == 0 || strcmp(argv[i], "-f") == 0) {
                 ++i;
@@ -82,9 +88,15 @@ int main(int argc, char** argv) {
             }
         }
     #else
-        width      = std::stoi(argv[1]);
-        height     = std::stoi(argv[2]);
-        iterations = std::stoi(argv[3]);
+        try {
+            width       = std::stoi(argv[1]);
+            height      = std::stoi(argv[2]);
+            iterations  = std::stoi(argv[3]);
+        }
+        catch(std::exception const& e) {
+            std::cout << "Error: " << e.what() << std::endl;
+        }
+
         for (int i = 4; i < argc; ++i) {
             if (strcmp(argv[i], "--file") == 0 || strcmp(argv[i], "-f") == 0) {
                 ++i;
