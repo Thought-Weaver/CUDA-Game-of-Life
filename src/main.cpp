@@ -8,7 +8,7 @@
 #include "utils.hpp"
 
 #if TEST
-#include "testsuite.hpp"
+    #include "testsuite.hpp"
 #endif
 
 /* Checks to see that the input arguments are valid. */
