@@ -22,7 +22,7 @@
 #include "grid.hpp"
 #include "utils.hpp"
 
-#define num_blocks 16
+#define test_blocks 16
 
 /* Run a series of comprehensive tests on IO utilities. */
 void run_io_tests();

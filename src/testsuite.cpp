@@ -174,7 +174,7 @@ void run_grid_update_tests() {
 
         // Iterates the specified number of times on the naive GPU method.
         for (int i = 0; i < iterations; ++i) {
-            grid->naive_gpu_update(num_blocks);
+            grid->naive_gpu_update(test_blocks);
         }
 
         // Make sure solution matches resulting grid.
