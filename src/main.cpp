@@ -16,7 +16,7 @@ void check_args(int argc, char **argv) {
     #if GPU
         if (argc < 5) {
             std::cerr << "Error: Incorrect number of arguments." << std::endl;
-            std::cerr << "Usage: cpu-gol {width} {height} {iterations} "
+            std::cerr << "Usage: gpu-gol {width} {height} {iterations} "
                       << "{num of blocks} -f {optional input file}" 
                       << std::endl;
             exit(EXIT_FAILURE);
@@ -65,7 +65,11 @@ int main(int argc, char** argv) {
             num_blocks  = std::stoi(argv[4]);
         }
         catch(std::exception const& e) {
-            std::cerr << "Error: " << e.what() << std::endl;
+            std::cerr << "Error: " << e.what() << std::endl << std::endl;
+
+            std::cerr << "Usage: gpu-gol {width} {height} {iterations} "
+                      << "{num of blocks} -f {optional input file}" 
+                      << std::endl;
         }
 
         for (int i = 5; i < argc; ++i) {
@@ -94,7 +98,11 @@ int main(int argc, char** argv) {
             iterations  = std::stoi(argv[3]);
         }
         catch(std::exception const& e) {
-            std::cerr << "Error: " << e.what() << std::endl;
+            std::cerr << "Error: " << e.what() << std::endl << std::endl;
+
+            std::cerr << "Usage: cpu-gol {width} {height} {iterations} "
+                      << "-f {optional input file}" 
+                      << std::endl;
         }
 
         for (int i = 4; i < argc; ++i) {
