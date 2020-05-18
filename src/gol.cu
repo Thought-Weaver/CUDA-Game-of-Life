@@ -36,7 +36,7 @@ __global__ void naive_update_kernel(int width, int height,
 
     // Thread indices.
     int tidx = blockIdx.x * blockDim.x + threadIdx.x;
-    int tidy = blockIdx.x * blockDim.x + threadIdx.x;
+    int tidy = blockIdx.y * blockDim.y + threadIdx.y;
 
     for (; tidy < height; tidy += num_threads_y) {
         for (; tidx < width; tidx += num_threads_x) {
@@ -68,14 +68,20 @@ void call_cuda_gol_update(int blocks, int threads_per_block,
                           int* cells, int* updated_cells,
                           bool optimized) {
     // Maybe I should fix these rather than let the user specify them?
-    dim3 blockSize(blocks, blocks);
-    dim3 gridSize(width / threads_per_block, height / threads_per_block);
+    dim3 block_size(blocks, blocks);
+    // Quick way to make the grid size works regardless of block size.
+    // TODO: Should be using threads_per_block, not blocks, but if I'm
+    // doing it like this, they should be condensed into a single
+    // value -- or removed entirely, not sure I want the user to specify
+    // it.
+    dim3 grid_size(int((width + blocks - 1) / blocks), 
+                   int((height + blocks - 1) / blocks));
     if (optimized) {
-        optimized_update_kernel<<<gridSize, blockSize>>>(width, height, 
-                                                         cells, updated_cells);
+        optimized_update_kernel<<<grid_size, block_size>>>(width, height, 
+                                                        cells, updated_cells);
     }
     else {
-        naive_update_kernel<<<gridSize, blockSize>>>(width, height,
-                                                     cells, updated_cells);
+        naive_update_kernel<<<grid_size, block_size>>>(width, height,
+                                                    cells, updated_cells);
     }
 }

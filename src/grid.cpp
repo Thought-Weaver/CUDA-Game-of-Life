@@ -110,6 +110,7 @@ void Grid::naive_gpu_update(int blocks, int threads_per_block) {
     gpuErrchk(cudaMemset(dev_out_cells, 0, 
         width * height * sizeof(int)));
 
+    // Update the cells using naive GPU method.
     call_cuda_gol_update(blocks, threads_per_block, 
                          width, height,
                          dev_cells, dev_out_cells, false);
@@ -145,6 +146,7 @@ void Grid::optimized_gpu_update(int blocks, int threads_per_block) {
     gpuErrchk(cudaMemset(dev_out_cells, 0, 
         width * height * sizeof(int)));
 
+    // Update the cells using optimized GPU method.
     call_cuda_gol_update(blocks, threads_per_block, 
                          width, height,
                          dev_cells, dev_out_cells, true);
