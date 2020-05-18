@@ -19,7 +19,7 @@
 
 #include <stdint.h>
 
-#include "gif.h"
+#include "gifanim.h"
 
 /* Takes a state of cells and outputs it to a PPM file. */
 void output_frame(int width, int height, std::string filename, uint8_t* cells, 

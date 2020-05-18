@@ -10,12 +10,13 @@
 void output_gif(int width, int height, std::string filename, 
                 std::vector<uint8_t*> history) {
 	int delay = 100;
+    GifAnim ganim;
 	GifWriter g;
-	GifBegin(&g, (filename + ".gif").c_str(), width, height, delay);
+	ganim.GifBegin(&g, (filename + ".gif").c_str(), width, height, delay);
     for (auto& cells : history) {
-        GifWriteFrame(&g, cells, width, height, delay);
+        ganim.GifWriteFrame(&g, cells, width, height, delay);
     }
-	GifEnd(&g);
+	ganim.GifEnd(&g);
 }
 
 

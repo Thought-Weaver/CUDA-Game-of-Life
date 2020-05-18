@@ -152,8 +152,9 @@ int main(int argc, char** argv) {
     // Parameters for GIF output.
     int delay = 100;
 	GifWriter g;
+    GifAnim ganim;
     if (out_filename != "") {
-	    GifBegin(&g, (out_filename + ".gif").c_str(), width, height, delay);
+	    ganim.GifBegin(&g, (out_filename + ".gif").c_str(), width, height, delay);
     }
 
     // Update and print grid.
@@ -171,13 +172,13 @@ int main(int argc, char** argv) {
         // Write an output frame every iteration.
         if (out_filename != "") {
             //output_frame(width, height, out_filename, grid->get_cells(), i);
-            GifWriteFrame(&g, grid->get_cells(), width, height, delay);
+            ganim.GifWriteFrame(&g, grid->get_cells(), width, height, delay);
         }
     }
 
     // Close and write the GIF.
     if (out_filename != "") {
-        GifEnd(&g);
+        ganim.GifEnd(&g);
     }
 
     // Free memory.
