@@ -3,6 +3,7 @@
 # Input Names
 CUDA_FILES = gol.cu
 CPP_FILES = utils.cpp grid.cpp
+TEST_FILES = utils.cpp grid.cpp testsuite.cpp
 CPP_MAIN = main.cpp
 
 # Directory names
@@ -62,6 +63,7 @@ CUDA_OBJ_FILES = $(addprefix $(OBJDIR)/, $(addsuffix .o, $(CUDA_FILES)))
 
 # C++ Object Files
 CPP_OBJ = $(addprefix $(OBJDIR)/, $(addsuffix .o, $(CPP_FILES)))
+TEST_OBJ = $(addprefix $(OBJDIR)/, $(addsuffix .o, $(TEST_FILES)))
 CPU_OBJ = $(addprefix $(OBJDIR)/cpu-, $(addsuffix .o, $(CPP_MAIN)))
 GPU_OBJ = $(addprefix $(OBJDIR)/gpu-, $(addsuffix .o, $(CPP_MAIN)))
 
