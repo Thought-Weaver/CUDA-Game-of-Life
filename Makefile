@@ -66,8 +66,7 @@ CPU_OBJ = $(addprefix $(OBJDIR)/cpu-, $(addsuffix .o, $(CPP_MAIN)))
 GPU_OBJ = $(addprefix $(OBJDIR)/gpu-, $(addsuffix .o, $(CPP_MAIN)))
 
 # All other objects that need to be linked in the final executable.
-OTHER_CPU_OBJ = $(CPP_OBJ)
-OTHER_GPU_OBJ = $(CPP_OBJ) $(CUDA_OBJ) $(CUDA_OBJ_FILES)
+COMMON_OBJ = $(CPP_OBJ) $(CUDA_OBJ) $(CUDA_OBJ_FILES)
 
 
 # ------------------------------------------------------------------------------
@@ -77,16 +76,16 @@ OTHER_GPU_OBJ = $(CPP_OBJ) $(CUDA_OBJ) $(CUDA_OBJ_FILES)
 # Top level rules
 all: cpu-gol gpu-gol
 
-cpu-gol: $(CPU_OBJ) $(OTHER_CPU_OBJ) 
-	$(GPP) $(FLAGS) -o $(BINDIR)/$@ $^
+cpu-gol: $(CPU_OBJ) $(COMMON_OBJ) 
+	$(GPP) $(FLAGS) -o $(BINDIR)/$@ $(INCLUDE) $^ $(CUDA_LIBS)
 
-gpu-gol: $(CONV_OBJ) $(OTHER_GPU_OBJ)
+gpu-gol: $(GPU_OBJ) $(COMMON_OBJ)
 	$(GPP) $(FLAGS) -o $(BINDIR)/$@ $(INCLUDE) $^ $(CUDA_LIBS)
 
 
 # Compile C++ Source Files
 $(CPU_OBJ): $(addprefix $(SRCDIR)/, $(CPP_MAIN)) 
-	$(GPP) $(FLAGS) -D GPU=0 -c -o $@ $<
+	$(GPP) $(FLAGS) -D GPU=0 -c -o $@ $(INCLUDE) $<
 
 $(GPU_OBJ): $(addprefix $(SRCDIR)/, $(CPP_MAIN))
 	$(GPP) $(FLAGS) -D GPU=1 -c -o $@ $(INCLUDE) $< 

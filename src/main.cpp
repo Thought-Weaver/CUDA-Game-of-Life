@@ -108,8 +108,8 @@ int* load_cells(int width, int height, std::string filename) {
     // Make sure there aren't fewer lines than there should be.
     if (i < height) {
         std::cerr << "Error: There were " << i << " lines in the "
-                    << "input file, but expected " << height << " lines."
-                    << std::endl;
+                  << "input file, but expected " << height << " lines."
+                  << std::endl;
         exit(EXIT_FAILURE);
     } 
     
@@ -122,15 +122,15 @@ void check_args(int argc, char **argv) {
         if (argc < 6) {
             std::cerr << "Error: Incorrect number of arguments." << std::endl;
             std::cerr << "Usage: cpu-gol {width} {height} {iterations} "
-                    << "{threads per block} {max num of blocks} -f " 
-                    << "{optional input file}" << std::endl;
+                      << "{threads per block} {max num of blocks} -f " 
+                      << "{optional input file}" << std::endl;
             exit(EXIT_FAILURE);
         }
     #else
         if (argc < 4) {
             std::cerr << "Error: Incorrect number of arguments." << std::endl;
             std::cerr << "Usage: cpu-gol {width} {height} {iterations} -f " 
-                    << "{optional input file}" << std::endl;
+                      << "{optional input file}" << std::endl;
             exit(EXIT_FAILURE);
         }
     #endif
