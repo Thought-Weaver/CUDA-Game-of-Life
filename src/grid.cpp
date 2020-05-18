@@ -4,8 +4,6 @@
  * @date 5/14/2020
  */
 
-#include <cuda_runtime.h>
-
 #include "grid.hpp"
 #include "gol.cuh"
 
@@ -97,8 +95,8 @@ void Grid::naive_cpu_update() {
 
 /* Update the current cells to the next state using a naive GPU method. */
 void Grid::naive_gpu_update(int blocks, int threads_per_block) {
-    int* dev_cells, 
-         dev_out_cells;
+    int* dev_cells;
+    int* dev_out_cells;
 
     // Allocate memory for GPU computation.
     gpuErrchk(cudaMalloc((void **) &dev_cells, 
@@ -132,8 +130,8 @@ void Grid::naive_gpu_update(int blocks, int threads_per_block) {
 
 /* Update the current cells to the next state using an optimized GPU method. */
 void Grid::optimized_gpu_update(int blocks, int threads_per_block) {
-    int* dev_cells, 
-         dev_out_cells;
+    int* dev_cells;
+    int* dev_out_cells;
 
     // Allocate memory for GPU computation.
     gpuErrchk(cudaMalloc((void **) &dev_cells, 

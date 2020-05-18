@@ -6,9 +6,6 @@
 
 #include "gol.cuh"
 
-#include <cstdio>
-#include <cuda_runtime.h>
-
 // What if I just passed the grid instead?
 __host__ __device__ int count_neighbors(int x, int y, 
                                         int width, int height, 

@@ -151,6 +151,8 @@ int main(int argc, char** argv) {
     bool quiet = false;
 
     // Make sure all arguments are valid and that the right number is present.
+    // TODO: With optional arguments, this makes checking the count impossible.
+    // Need to raise an error if atoi fails?
     check_args(argc, argv);
 
     // Parse command line arguments.
@@ -229,7 +231,11 @@ int main(int argc, char** argv) {
 
     // Update and print grid.
     for (int i = 0; i < iterations; ++i) {
-        grid->naive_cpu_update();
+        #if GPU
+            grid->naive_gpu_update(num_blocks, num_threads);
+        #else
+            grid->naive_cpu_update();
+        #endif
 
         if (!quiet) {
             print_cells(width, height, grid->get_cells());
