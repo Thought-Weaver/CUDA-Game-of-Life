@@ -49,7 +49,7 @@ int main(int argc, char** argv) {
         width = 10, 
         height = 10,
         num_blocks = 16,
-        delay = 100; // in hundredths of a second
+        delay = 25; // in hundredths of a second
     // Print output boolean option.
     bool quiet = false;
 
