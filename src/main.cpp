@@ -48,7 +48,8 @@ int main(int argc, char** argv) {
     int iterations = 0, 
         width = 10, 
         height = 10,
-        num_blocks = 16;
+        num_blocks = 16,
+        delay = 100; // in ms
     // Print output boolean option.
     bool quiet = false;
 
@@ -85,6 +86,18 @@ int main(int argc, char** argv) {
                 if (i < argc) {
                     out_filename = argv[i];
                 }
+
+                ++i;
+                try {
+                    delay = std::stoi(argv[i]);
+                }
+                catch(std::exception const& e) {
+                    std::cerr << "Error: " << e.what() << std::endl << std::endl;
+
+                    std::cerr << "Usage: gpu-gol {width} {height} {iterations} "
+                            << "{num of blocks} -o {base filename} {delay in ms}" 
+                            << std::endl;
+                }
             }
 
             if (strcmp(argv[i], "-q") == 0) {
@@ -117,6 +130,18 @@ int main(int argc, char** argv) {
                 ++i;
                 if (i < argc) {
                     out_filename = argv[i];
+                }
+
+                ++i;
+                try {
+                    delay = std::stoi(argv[i]);
+                }
+                catch(std::exception const& e) {
+                    std::cerr << "Error: " << e.what() << std::endl << std::endl;
+
+                    std::cerr << "Usage: gpu-gol {width} {height} {iterations} "
+                            << "{num of blocks} -o {base filename} {delay in ms}" 
+                            << std::endl;
                 }
             }
 
