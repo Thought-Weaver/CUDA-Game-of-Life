@@ -175,7 +175,6 @@ int main(int argc, char** argv) {
     }
 
     // Parameters for GIF output.
-    int delay = 25; // in ms
 	GifWriter g;
     GifAnim ganim;
     if (out_filename != "") {
