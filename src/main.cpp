@@ -74,6 +74,7 @@ int main(int argc, char** argv) {
         }
 
         for (int i = 5; i < argc; ++i) {
+            // Check for input filename argument.
             if (strcmp(argv[i], "--file") == 0 || strcmp(argv[i], "-f") == 0) {
                 ++i;
                 if (i < argc) {
@@ -81,6 +82,7 @@ int main(int argc, char** argv) {
                 }
             }
             
+            // Check for output filename argument and delay argument.
             if (strcmp(argv[i], "--out") == 0 || strcmp(argv[i], "-o") == 0) {
                 ++i;
                 if (i < argc) {
@@ -120,6 +122,7 @@ int main(int argc, char** argv) {
         }
 
         for (int i = 4; i < argc; ++i) {
+            // Check for input filename argument.
             if (strcmp(argv[i], "--file") == 0 || strcmp(argv[i], "-f") == 0) {
                 ++i;
                 if (i < argc) {
@@ -127,6 +130,7 @@ int main(int argc, char** argv) {
                 }
             }
 
+            // Check for output filename argument and delay argument.
             if (strcmp(argv[i], "--out") == 0 || strcmp(argv[i], "-o") == 0) {
                 ++i;
                 if (i < argc) {
