@@ -49,7 +49,7 @@ int main(int argc, char** argv) {
         width = 10, 
         height = 10,
         num_blocks = 16,
-        delay = 100; // in ms
+        delay = 100; // in hundredths of a second
     // Print output boolean option.
     bool quiet = false;
 
@@ -95,7 +95,8 @@ int main(int argc, char** argv) {
                     std::cerr << "Error: " << e.what() << std::endl << std::endl;
 
                     std::cerr << "Usage: gpu-gol {width} {height} {iterations} "
-                            << "{num of blocks} -o {base filename} {delay in ms}" 
+                            << "{num of blocks} -o {base filename}" 
+                            << "{delay in hundredths of a second}"
                             << std::endl;
                 }
             }
@@ -140,7 +141,8 @@ int main(int argc, char** argv) {
                     std::cerr << "Error: " << e.what() << std::endl << std::endl;
 
                     std::cerr << "Usage: gpu-gol {width} {height} {iterations} "
-                            << "{num of blocks} -o {base filename} {delay in ms}" 
+                            << "{num of blocks} -o {base filename}" 
+                            << "{delay in hundredths of a second}"
                             << std::endl;
                 }
             }
