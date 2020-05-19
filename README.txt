@@ -18,7 +18,7 @@ parallelize the algorithms involved with computing the Game of Life using CUDA.
 # USAGE                                                                       #
 #-----------------------------------------------------------------------------#
 
-There are two ways to build the project:
+There are two main ways to build the project:
 
 make cpu-gol
 make gpu-gol
@@ -36,8 +36,8 @@ are other, optional parameters you can specify:
 -f {filename} will load the input file of 0s and 1s and convert it into a cell
 grid.
 
--o {base filename} will generate output images in .ppm format using the input
-name as a base filename as: ./output_frames/{base}_{iter num}.ppm
+-o {base filename} {gif frame delay in ms} will generate an output GIF with the
+given frame delay as ./gifs/{base filename}.gif
 
 -q will enable quiet mode and prevent printing the cell state to the terminal.
 
@@ -48,8 +48,16 @@ Here's an example of running the program on the CPU with a period-3 pulsar:
 ./bin/cpu-gol 17 15 6 -f ./grids/17x15_Pulsar.txt
 
 #-----------------------------------------------------------------------------#
+# TESTS                                                                       #
+#-----------------------------------------------------------------------------#
+
+You can also build the project using make test. This will create an executable
+called test in the bin directory. Running ./bin/test will run a series of tests
+on the IO and Grid class functions. If everything runs fine, the program will
+print out numerous successes; if not, it will exit with an assertion error.
+
+#-----------------------------------------------------------------------------#
 # OPTIMIZATIONS                                                               #
 #-----------------------------------------------------------------------------#
 
 Still a work-in-progress.
-
