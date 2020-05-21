@@ -7,17 +7,6 @@
 #include "grid.hpp"
 #include "gol.cuh"
 
-/* Modified from https://bit.ly/365DwFs */
-#define gpuErrchk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
-inline void gpuAssert(cudaError_t code, const char *file, 
-                      int line, bool abort=true) {
-    if (code != cudaSuccess) {
-        fprintf(stderr,"GPUassert: %s %s %d\n", 
-                cudaGetErrorString(code), file, line);
-        exit(code);
-    }
-}
-
 /* Constructor for the grid. */
 Grid::Grid(int w, int h, uint8_t* initial_state) {
     // I should probably add some error check that verifies that initial_state

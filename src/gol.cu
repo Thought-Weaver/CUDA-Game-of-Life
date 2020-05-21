@@ -78,7 +78,7 @@ __global__ void optimized_update_kernel(int width, int height,
         for (int y = -1; y <= 1; ++y) {
             int y2 = tidy + y;
             int x2 = tidx + x;
-            if (y2 != y || x2 != x) {
+            if (x != 0 || y != 0) {
                 if (y2 >= 0 && y2 < height && 
                     x2 >= 0 && x2 < width) {
                     neighbors += tex2D(texmem, x2, y2);
@@ -113,12 +113,13 @@ void call_cuda_gol_update(int num_threads,
     if (optimized) {
         cudaChannelFormatDesc desc = cudaCreateChannelDesc<uint8_t>();
 
-        size_t pitch;
-        cudaMallocPitch(&cells, &pitch, sizeof(uint8_t) * width, height);
-        cudaBindTexture2D(0, texmem, cells, desc, width, height, pitch);
+        gpuErrchk(cudaBindTexture2D(0, texmem, cells, desc, 
+            width, height, sizeof(uint8_t) * width));
 
         optimized_update_kernel<<<grid_size, block_size>>>(width, height, 
             updated_cells);
+        
+        gpuErrchk(cudaUnbindTexture(texmem));
     }
     else {
         naive_update_kernel<<<grid_size, block_size>>>(width, height, 
