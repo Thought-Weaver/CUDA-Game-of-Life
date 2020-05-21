@@ -6,6 +6,10 @@
 
 #include "gol.cuh"
 
+// Trying texture memory -- probably not better than just using shared memory,
+// but it's worth a shot.
+texture<uint8_t, 2> texmem;
+
 // What if I just passed the grid instead?
 __host__ __device__ int count_neighbors(int x, int y, 
                                         int width, int height, 
