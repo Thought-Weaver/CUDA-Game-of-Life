@@ -13,7 +13,7 @@
 #include <stdint.h>
 #include <cuda_runtime.h>
 
-void call_cuda_gol_update(int blocks,
+void call_cuda_gol_update(int num_threads,
                           int width, int height,
                           uint8_t* cells, uint8_t* updated_cells,
                           bool optimized);

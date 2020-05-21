@@ -17,7 +17,7 @@ void check_args(int argc, char **argv) {
         if (argc < 5) {
             std::cerr << "Error: Incorrect number of arguments." << std::endl;
             std::cerr << "Usage: gpu-gol {width} {height} {iterations} "
-                      << "{num of blocks} -f {optional input file}" 
+                      << "{num of threads per block} -f {optional input file}" 
                       << std::endl;
             exit(EXIT_FAILURE);
         }
@@ -48,10 +48,11 @@ int main(int argc, char** argv) {
     int iterations = 0, 
         width = 10, 
         height = 10,
-        num_blocks = 16,
+        num_threads = 16,
         delay = 25; // in hundredths of a second
     // Print output boolean option.
-    bool quiet = false;
+    bool quiet = false,
+         optimized = false;
 
     // Make sure all arguments are valid and that the right number is present.
     // TODO: With optional arguments, this makes checking the count impossible.
@@ -63,13 +64,13 @@ int main(int argc, char** argv) {
             width       = std::stoi(argv[1]);
             height      = std::stoi(argv[2]);
             iterations  = std::stoi(argv[3]);
-            num_blocks  = std::stoi(argv[4]);
+            num_threads  = std::stoi(argv[4]);
         }
         catch(std::exception const& e) {
             std::cerr << "Error: " << e.what() << std::endl << std::endl;
 
             std::cerr << "Usage: gpu-gol {width} {height} {iterations} "
-                      << "{num of blocks} -f {optional input file}" 
+                      << "{num of threads per block} -f {optional input file}" 
                       << std::endl;
         }
 
@@ -97,7 +98,7 @@ int main(int argc, char** argv) {
                     std::cerr << "Error: " << e.what() << std::endl << std::endl;
 
                     std::cerr << "Usage: gpu-gol {width} {height} {iterations} "
-                            << "{num of blocks} -o {base filename}" 
+                            << "{num of threads per block} -o {base filename}" 
                             << "{delay in hundredths of a second}"
                             << std::endl;
                 }
@@ -105,6 +106,10 @@ int main(int argc, char** argv) {
 
             if (strcmp(argv[i], "-q") == 0) {
                 quiet = true;
+            }
+
+            if (strcmp(argv[i], "-opt") == 0) {
+                optimized = true;
             }
         }
     #else
@@ -145,7 +150,7 @@ int main(int argc, char** argv) {
                     std::cerr << "Error: " << e.what() << std::endl << std::endl;
 
                     std::cerr << "Usage: gpu-gol {width} {height} {iterations} "
-                            << "{num of blocks} -o {base filename}" 
+                            << "{num of threads per block} -o {base filename}" 
                             << "{delay in hundredths of a second}"
                             << std::endl;
                 }
@@ -191,7 +196,12 @@ int main(int argc, char** argv) {
     // Update and print grid.
     for (int i = 0; i < iterations; ++i) {
         #if GPU
-            grid->naive_gpu_update(num_blocks);
+            if (!optimized) {
+                grid->naive_gpu_update(num_threads);
+            }
+            else {
+                grid->optimized_gpu_update(num_threads);
+            }
         #else
             grid->naive_cpu_update();
         #endif

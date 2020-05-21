@@ -210,9 +210,20 @@ void run_grid_update_tests() {
         // Make sure solution matches resulting grid.
         assert(check_equal(width, height, grid->get_cells(), solution_state));
 
-        std::cout << "NAIVE GPU: PASSED" << std::endl << std::endl;
+        std::cout << "NAIVE GPU: PASSED" << std::endl;
 
-        // TODO: Add test for optimized GPU update when ready.
+        // Reset grid to initial state for next method test.
+        grid->set_cells(initial_state);
+
+        // Iterates the specified number of times on the naive GPU method.
+        for (int i = 0; i < iterations; ++i) {
+            grid->optimized_gpu_update(test_blocks);
+        }
+
+        // Make sure solution matches resulting grid.
+        assert(check_equal(width, height, grid->get_cells(), solution_state));
+
+        std::cout << "OPTIMIZED GPU: PASSED" << std::endl << std::endl;
 
         // Free memory.
         delete[] initial_state;
