@@ -10,7 +10,8 @@
 // but it's worth a shot.
 // Also, I feel like this shouldn't be global, but all the CUDA examples have
 // it as such?
-texture<uint8_t, 2, cudaReadModeElementType> texmem;
+// Commenting until I figure out what's going wrong with texture mem.
+// texture<uint8_t, 2, cudaReadModeElementType> texmem;
 
 // What if I just passed the grid instead?
 __host__ __device__ uint8_t count_neighbors(int x, int y, 
@@ -64,7 +65,7 @@ __global__ void naive_update_kernel(int width, int height,
     }
 }
 
-__global__ void optimized_update_kernel(int width, int height,
+/*__global__ void optimized_update_kernel(int width, int height,
                                         uint8_t* updated_cells) {
     int tidx = blockIdx.x * blockDim.x + threadIdx.x;
     int tidy = blockIdx.y * blockDim.y + threadIdx.y;
@@ -79,10 +80,7 @@ __global__ void optimized_update_kernel(int width, int height,
             int y2 = tidy + y;
             int x2 = tidx + x;
             if (x != 0 || y != 0) {
-                if (y2 >= 0 && y2 < height && 
-                    x2 >= 0 && x2 < width) {
-                    neighbors += tex2D(texmem, x2, y2);
-                }
+                neighbors += tex2D(texmem, x2, y2);
             }
         }
     }
@@ -100,6 +98,11 @@ __global__ void optimized_update_kernel(int width, int height,
     else {
         updated_cells[tidy * width + tidx] = 0;
     }
+}*/
+
+__global__ void optimized_update_kernel(int width, int height,
+    uint8_t* updated_cells) {
+        
 }
 
 void call_cuda_gol_update(int num_threads,
@@ -111,15 +114,30 @@ void call_cuda_gol_update(int num_threads,
     dim3 grid_size(int((width + num_threads - 1) / num_threads), 
                    int((height + num_threads - 1) / num_threads));
     if (optimized) {
+        /*
+        // Have to use CUDA arrays, otherwise it only works with widths
+        // that are a power of 2. Not sure why.
+        cudaArray* cells_array;
         cudaChannelFormatDesc desc = cudaCreateChannelDesc<uint8_t>();
+        gpuErrchk(cudaMallocArray(&cells_array, &desc, width, height));
+        gpuErrchk(cudaMemcpyToArray(cells_array, 0, 0, cells,
+            width * height * sizeof(uint8_t), cudaMemcpyDeviceToDevice));
 
-        gpuErrchk(cudaBindTexture2D(0, texmem, cells, desc, 
-            width, height, sizeof(uint8_t) * width));
+        // Set up texture params.
+        texmem.normalized = false;
+        texmem.addressMode[0] = cudaAddressModeClamp;
+        texmem.addressMode[1] = cudaAddressModeClamp;
+        texmem.filterMode = cudaFilterModePoint;
+
+        gpuErrchk(cudaBindTextureToArray(texmem, cells_array, desc));
 
         optimized_update_kernel<<<grid_size, block_size>>>(width, height, 
             updated_cells);
         
-        gpuErrchk(cudaUnbindTexture(texmem));
+        gpuErrchk(cudaUnbindTexture(texmem));*/
+
+        optimized_update_kernel<<<grid_size, block_size>>>(width, height, 
+            updated_cells);
     }
     else {
         naive_update_kernel<<<grid_size, block_size>>>(width, height, 
