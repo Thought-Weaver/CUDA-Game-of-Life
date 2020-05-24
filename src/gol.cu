@@ -108,6 +108,10 @@ __global__ void optimized_update_kernel(int width, int height,
         else if (neighbors == 3 && shmem[i * width + j] == 0) {
             updated_cells[tidy * width + tidx] = 1;
         }
+        // Any other cells die.
+        else {
+            updated_cells[tidy * width + tidx] = 0;
+        }
     }
 }
 

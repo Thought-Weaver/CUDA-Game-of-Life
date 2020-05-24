@@ -22,14 +22,6 @@
 
 class Grid {
     private:
-        /* List of previous grid states. */
-        // Note to self: Does it make sense to keep a history? Why not output
-        // a PPM of the grid after every computation and save ourselves the
-        // memory? It's potentially good for interactive visualization, but
-        // this project likely won't support that. I could argue the case for
-        // future development, though.
-        std::vector<uint8_t*> history;
-
         /* A 2D array of size width x height containing a 0 in index i, j if
          * the cell is dead and a 1 if it's alive. This is the current state
          * of the grid.

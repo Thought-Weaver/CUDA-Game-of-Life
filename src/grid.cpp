@@ -147,8 +147,6 @@ void Grid::optimized_gpu_update(int blocks) {
     // Copy memory to device.
     gpuErrchk(cudaMemcpy(dev_cells, cells, 
         width * height * sizeof(uint8_t), cudaMemcpyHostToDevice));
-    gpuErrchk(cudaMemset(dev_out_cells, 0, 
-        width * height * sizeof(uint8_t)));
 
     // Update the cells using optimized GPU method.
     call_cuda_gol_update(blocks, 

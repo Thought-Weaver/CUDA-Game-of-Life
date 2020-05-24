@@ -71,8 +71,7 @@ print out numerous successes; if not, it will exit with an assertion error.
 -Changed from int to uint_8 which is 8 bits instead of 32.
 -Unrolling loops for counting neighbors.
 -Using short-circuiting on the GoL rules to avoid unnecessary accesses.
--Removed "all other cells die" rule in the optimized GPU version, since we
- memset to 0 before copying the data to the GPU.
+-Removed memset to reduce number of repeated writes to GPU memory.
 
 #-----------------------------------------------------------------------------#
 # DISCUSSION                                                                  #
@@ -82,4 +81,14 @@ After several practical tests, I believe that shared memory is actually a worse
 option compared to global memory. Since compute compatibility >2 support, the
 benefits haven't been that great and we have memory limits with shared memory;
 global memory was able to compute a 512x512 board for 10000 iterations without
-any problem, but shared memory was unable to allocate enough memory. 
+any problem, but shared memory was unable to allocate enough memory.
+
+I tested a variety of optimizations, all of which are visible in the git commit
+history. Texture memory, in particular, didn't turn out to be sufficiently fast
+to keep around. As far as I can tell, the primary bottleneck with the program
+is actually I/O; copying back and forth from the host to the device and so
+forth appears to be the largest source of delays.
+
+See the following brainstorming document for more discussion:
+
+https://bit.ly/3bZXaE0
