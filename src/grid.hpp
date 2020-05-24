@@ -20,14 +20,11 @@
 #include <stdint.h>
 #include <time.h>
 
+#include <thrust/host_vector.h>
+
 class Grid {
     private:
         /* List of previous grid states. */
-        // Note to self: Does it make sense to keep a history? Why not output
-        // a PPM of the grid after every computation and save ourselves the
-        // memory? It's potentially good for interactive visualization, but
-        // this project likely won't support that. I could argue the case for
-        // future development, though.
         std::vector<uint8_t*> history;
 
         /* A 2D array of size width x height containing a 0 in index i, j if
@@ -55,6 +52,13 @@ class Grid {
         /* Sets cells to another state of cells. */
         void set_cells(uint8_t* other_cells);
 
+        /* Get the history of cell states. */
+        std::vector<uint8_t*> get_history();
+
+        /* Set the history of cell states. */
+        void set_history(thrust::host_vector<uint8_t*> host_history, 
+                         int iterations);
+
         /* Update the current cells to the next state using a naive CPU method. 
          */
         void naive_cpu_update();
@@ -66,7 +70,7 @@ class Grid {
         /* Update the current cells to the next state using an optimized GPU 
          * method. 
          */
-        void optimized_gpu_update(int blocks);
+        void optimized_gpu_update(int blocks, int iterations);
 
         /* Operator overload for comparing two grids. */
         bool operator==(const Grid& g) {

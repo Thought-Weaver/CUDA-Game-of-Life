@@ -185,42 +185,53 @@ int main(int argc, char** argv) {
         print_cells(width, height, grid->get_cells());
     }
 
-    // Parameters for GIF output.
-	GifWriter g;
-    GifAnim ganim;
-    if (out_filename != "") {
-	    ganim.GifBegin(&g, ("./gifs/" + out_filename + ".gif").c_str(), 
-                       width, height, delay);
-    }
+    if (!optimized) {
+        // Parameters for GIF output.
+        GifWriter g;
+        GifAnim ganim;
+        if (out_filename != "") {
+            ganim.GifBegin(&g, ("./gifs/" + out_filename + ".gif").c_str(), 
+                        width, height, delay);
+        }
 
-    // Update and print grid.
-    for (int i = 0; i < iterations; ++i) {
-        #if GPU
-            if (!optimized) {
+        // Update and print grid.
+        for (int i = 0; i < iterations; ++i) {
+            #if GPU
                 grid->naive_gpu_update(num_threads);
+            #else
+                grid->naive_cpu_update();
+            #endif
+
+            if (!quiet) {
+                print_cells(width, height, grid->get_cells());
             }
-            else {
-                grid->optimized_gpu_update(num_threads);
+
+            // Write an output frame every iteration.
+            if (!optimized && out_filename != "") {
+                //output_frame(width, height, out_filename, grid->get_cells(), i);
+                output_gif_frame(width, height, grid->get_cells(), 
+                                &g, &ganim, delay);
             }
-        #else
-            grid->naive_cpu_update();
-        #endif
+        }
+
+        // Close and write the GIF.
+        if (out_filename != "") {
+            ganim.GifEnd(&g);
+        }
+    }
+    else {
+        // If we're optimized, use the vector return form.
+        grid->optimized_gpu_update(num_threads, iterations);
 
         if (!quiet) {
-            print_cells(width, height, grid->get_cells());
+            for (auto& cells : grid->get_history()) {
+                print_cells(width, height, cells);
+            }
         }
 
-        // Write an output frame every iteration.
         if (out_filename != "") {
-            //output_frame(width, height, out_filename, grid->get_cells(), i);
-            output_gif_frame(width, height, grid->get_cells(), 
-                             &g, &ganim, delay);
+            output_gif(width, height, out_filename, grid->get_history());
         }
-    }
-
-    // Close and write the GIF.
-    if (out_filename != "") {
-        ganim.GifEnd(&g);
     }
 
     // Free memory.

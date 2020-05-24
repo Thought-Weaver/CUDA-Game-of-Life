@@ -111,21 +111,41 @@ __global__ void optimized_update_kernel(int width, int height,
     }
 }
 
-void call_cuda_gol_update(int num_threads,
+void call_cuda_naive_gol_update(int num_threads,
                           int width, int height,
-                          uint8_t* cells, uint8_t* updated_cells,
-                          bool optimized) {
+                          uint8_t* cells, uint8_t* updated_cells) {
     // Maybe I should fix these rather than let the user specify them?
     dim3 block_size(num_threads, num_threads);
     dim3 grid_size(int((width + num_threads - 1) / num_threads), 
                    int((height + num_threads - 1) / num_threads));
-    if (optimized) {
+
+    naive_update_kernel<<<grid_size, block_size>>>(width, height, 
+        cells, updated_cells);
+}
+
+void call_cuda_opt_gol_update(int num_threads,
+                          int width, int height,
+                          uint8_t* init_cells,
+                          int iterations, 
+                          thrust::host_vector<uint8_t*> host_history) {
+    dim3 block_size(num_threads, num_threads);
+    dim3 grid_size(int((width + num_threads - 1) / num_threads), 
+                   int((height + num_threads - 1) / num_threads));
+
+    thrust::device_vector<uint8_t*> device_history(iterations + 1);
+    device_history[0] = init_cells;
+
+    for (int i = 0; i < iterations; ++i) {
+        gpuErrchk(cudaMalloc((void **) &(device_history[i + 1]), 
+            width * height * sizeof(uint8_t)));
+        gpuErrchk(cudaMemset(device_history[i + 1], 0,
+            width * height * sizeof(uint8_t)));
+        
         optimized_update_kernel<<<grid_size, block_size, 
             (width * height + 4) * sizeof(uint8_t)>>>(width, height, 
-            cells, updated_cells);
+            device_history[i], device_history[i + 1]);
     }
-    else {
-        naive_update_kernel<<<grid_size, block_size>>>(width, height, 
-            cells, updated_cells);
-    }
+
+    // device_history is automatically deleted when the function call returns.
+    host_history = device_history;
 }
