@@ -65,44 +65,50 @@ __global__ void naive_update_kernel(int width, int height,
     }
 }
 
-/*__global__ void optimized_update_kernel(int width, int height,
-                                        uint8_t* updated_cells) {
+__global__ void optimized_update_kernel(int width, int height,
+        uint8_t* cells, uint8_t* updated_cells) {
+    extern __shared__ uint8_t shmem[];
+
     int tidx = blockIdx.x * blockDim.x + threadIdx.x;
     int tidy = blockIdx.y * blockDim.y + threadIdx.y;
+    
+    int i = threadIdx.y;
+    int j = threadIdx.x;
 
-    uint8_t neighbors = 0;
-            
-    // Take advantage of loop unrolling to make this faster.
-    #pragma unroll
-    for (int x = -1; x <= 1; ++x) {
+    if (tidx >= 0 && tidx < width && tidy >= 0 && tidy < height) {
+        shmem[i * width + j] = cells[tidy * width + tidx];
+    }
+
+    __syncthreads();
+
+    if (tidx >= 0 && tidx < width && tidy >= 0 && tidy < height) {
+        uint8_t neighbors = 0;
+
+        // Take advantage of loop unrolling to make this faster.
         #pragma unroll
-        for (int y = -1; y <= 1; ++y) {
-            int y2 = tidy + y;
-            int x2 = tidx + x;
-            if (x != 0 || y != 0) {
-                neighbors += tex2D(texmem, x2, y2);
+        for (int x = -1; x <= 1; ++x) {
+            #pragma unroll
+            for (int y = -1; y <= 1; ++y) {
+                int y2 = i + y;
+                int x2 = j + x;
+                if (x != 0 || y != 0) {
+                    if (y2 >= 0 && y2 < height && 
+                            x2 >= 0 && x2 < width) {
+                        neighbors += shmem[y2 * width + x2];
+                    }
+                }
             }
         }
-    }
 
-    // Any live cell with two or three neighbors survives.
-    if (tex2D(texmem, tidx, tidy) == 1 && 
-            (neighbors == 2 || neighbors == 3)) {
-        updated_cells[tidy * width + tidx] = 1;
+        // Any live cell with two or three neighbors survives.
+        if ((neighbors == 2 || neighbors == 3) && shmem[i * width + j] == 1) {
+            updated_cells[tidy * width + tidx] = 1;
+        }
+        // Any dead cell with three live neighbors comes to life.
+        else if (neighbors == 3 && shmem[i * width + j] == 0) {
+            updated_cells[tidy * width + tidx] = 1;
+        }
     }
-    // Any dead cell with three live neighbors comes to life.
-    else if (tex2D(texmem, tidx, tidy) == 0 && neighbors == 3) {
-        updated_cells[tidy * width + tidx] = 1;
-    }
-    // Any other cells die.
-    else {
-        updated_cells[tidy * width + tidx] = 0;
-    }
-}*/
-
-__global__ void optimized_update_kernel(int width, int height,
-    uint8_t* updated_cells) {
-        
 }
 
 void call_cuda_gol_update(int num_threads,
@@ -114,30 +120,9 @@ void call_cuda_gol_update(int num_threads,
     dim3 grid_size(int((width + num_threads - 1) / num_threads), 
                    int((height + num_threads - 1) / num_threads));
     if (optimized) {
-        /*
-        // Have to use CUDA arrays, otherwise it only works with widths
-        // that are a power of 2. Not sure why.
-        cudaArray* cells_array;
-        cudaChannelFormatDesc desc = cudaCreateChannelDesc<uint8_t>();
-        gpuErrchk(cudaMallocArray(&cells_array, &desc, width, height));
-        gpuErrchk(cudaMemcpyToArray(cells_array, 0, 0, cells,
-            width * height * sizeof(uint8_t), cudaMemcpyDeviceToDevice));
-
-        // Set up texture params.
-        texmem.normalized = false;
-        texmem.addressMode[0] = cudaAddressModeClamp;
-        texmem.addressMode[1] = cudaAddressModeClamp;
-        texmem.filterMode = cudaFilterModePoint;
-
-        gpuErrchk(cudaBindTextureToArray(texmem, cells_array, desc));
-
-        optimized_update_kernel<<<grid_size, block_size>>>(width, height, 
-            updated_cells);
-        
-        gpuErrchk(cudaUnbindTexture(texmem));*/
-
-        optimized_update_kernel<<<grid_size, block_size>>>(width, height, 
-            updated_cells);
+        optimized_update_kernel<<<grid_size, block_size, 
+            (width * height + 4) * sizeof(uint8_t)>>>(width, height, 
+            cells, updated_cells);
     }
     else {
         naive_update_kernel<<<grid_size, block_size>>>(width, height, 

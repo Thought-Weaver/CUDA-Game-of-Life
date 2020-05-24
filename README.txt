@@ -67,4 +67,9 @@ print out numerous successes; if not, it will exit with an assertion error.
 # OPTIMIZATIONS                                                               #
 #-----------------------------------------------------------------------------#
 
-Still a work-in-progress.
+-Optimized form uses shared memory.
+-Changed from int to uint_8 which is 8 bits instead of 32.
+-Unrolling loops for counting neighbors.
+-Using short-circuiting on the GoL rules to avoid unnecessary accesses.
+-Removed "all other cells die" rule in the optimized GPU version, since we
+ memset to 0 before copying the data to the GPU.
