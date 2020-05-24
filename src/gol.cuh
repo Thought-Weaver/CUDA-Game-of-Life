@@ -33,8 +33,7 @@ void call_cuda_naive_gol_update(int num_threads,
 
 void call_cuda_opt_gol_update(int num_threads,
                         int width, int height,
-                        uint8_t* init_cells,
                         int iterations, 
-                        thrust::host_vector<uint8_t*> host_history);
+                        uint8_t* dev_history[]);
 
 #endif

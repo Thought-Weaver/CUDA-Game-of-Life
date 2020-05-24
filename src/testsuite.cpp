@@ -96,7 +96,7 @@ void run_io_tests() {
     std::cout << "puffer input: PASSED" << std::endl;
 
     // Output check, just to make sure it exists.
-    output_gif(10, 10, "test", std::vector<uint8_t*> { glider });
+    output_gif(10, 10, "test", new uint8_t* { glider }, 0);
     std::ifstream file("./gifs/test.gif");
     assert(file.good());
 

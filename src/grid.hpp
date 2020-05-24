@@ -24,8 +24,8 @@
 
 class Grid {
     private:
-        /* List of previous grid states. */
-        std::vector<uint8_t*> history;
+        /* Array of previous grid states. */
+        uint8_t** history;
 
         /* A 2D array of size width x height containing a 0 in index i, j if
          * the cell is dead and a 1 if it's alive. This is the current state
@@ -53,11 +53,7 @@ class Grid {
         void set_cells(uint8_t* other_cells);
 
         /* Get the history of cell states. */
-        std::vector<uint8_t*> get_history();
-
-        /* Set the history of cell states. */
-        void set_history(thrust::host_vector<uint8_t*> host_history, 
-                         int iterations);
+        uint8_t** get_history();
 
         /* Update the current cells to the next state using a naive CPU method. 
          */

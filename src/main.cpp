@@ -224,13 +224,15 @@ int main(int argc, char** argv) {
         grid->optimized_gpu_update(num_threads, iterations);
 
         if (!quiet) {
-            for (auto& cells : grid->get_history()) {
-                print_cells(width, height, cells);
+            uint8_t** history = grid->get_history();
+            for (int i = 0; i <= iterations; ++i) {
+                print_cells(width, height, history[i]);
             }
         }
 
         if (out_filename != "") {
-            output_gif(width, height, out_filename, grid->get_history());
+            output_gif(width, height, out_filename, 
+                grid->get_history(), iterations);
         }
     }
 

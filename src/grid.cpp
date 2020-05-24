@@ -41,15 +41,8 @@ void Grid::set_cells(uint8_t* other_cells) {
 }
 
 /* Get the history of cell states. */
-std::vector<uint8_t*> Grid::get_history() {
+uint8_t** Grid::get_history() {
     return history;
-}
-
-/* Set the history of cell states from a thrust vector. */
-void Grid::set_history(thrust::host_vector<uint8_t*> host_history, int iterations) {
-    for (int i = 0; i < iterations; ++i) {
-        history.push_back(host_history[i]);
-    }
 }
 
 /* Counts the living neighbors of a cell. */
@@ -147,29 +140,46 @@ void Grid::naive_gpu_update(int blocks) {
 
 /* Update the current cells to the next state using an optimized GPU method. */
 void Grid::optimized_gpu_update(int blocks, int iterations) {
-    uint8_t* dev_cells;
+    uint8_t** dev_history;
+    history = new uint8_t*[iterations + 1];
 
-    thrust::host_vector<uint8_t*> host_history(iterations + 1);
-
-    // Allocate memory for GPU computation.
-    gpuErrchk(cudaMalloc((void **) &dev_cells, 
-        width * height * sizeof(uint8_t)));
+    // In order to copy over an array of pointers, we need to start by making
+    // a host array of pointers to device arrays, then copy it into a device
+    // array of pointers to device arrays.
+    for (int i = 0; i <= iterations; ++i) {
+        gpuErrchk(cudaMalloc((void **) &history[i], 
+            width * height * sizeof(uint8_t)));
+    }
 
     // Copy memory to device.
-    gpuErrchk(cudaMemcpy(dev_cells, cells, 
+    gpuErrchk(cudaMemcpy(history[0], cells, 
         width * height * sizeof(uint8_t), cudaMemcpyHostToDevice));
+
+    // Allocate history.
+    gpuErrchk(cudaMalloc(&dev_history, 
+        (iterations + 1) * sizeof(uint8_t*)));
+
+    // Copy host history to device history.
+    gpuErrchk(cudaMemcpy(dev_history, history, 
+        (iterations + 1) * sizeof(uint8_t*), cudaMemcpyHostToDevice));
+
+    for (int i = 0; i <= iterations; ++i) {
+        gpuErrchk(cudaMemcpy(dev_history[i], history[i], 
+            width * height * sizeof(uint8_t), cudaMemcpyHostToDevice));
+    }
 
     // Update the cells using optimized GPU method.
     call_cuda_opt_gol_update(blocks, 
-                         width, height,
-                         dev_cells, 
-                         iterations, host_history);
+                             width, height,
+                             iterations, dev_history);
 
-    // Copy history to Grid.
-    set_history(host_history, iterations);
+    // Copy memory back to host.
+    gpuErrchk(cudaMemcpy(history, dev_history, 
+        sizeof(uint8_t*) * iterations, cudaMemcpyDeviceToHost));
 
     // Free memory.
-    cudaFree(dev_cells);
-
-    // host_history is automatically deleted when the function call returns.
+    for (int i = 0; i <= iterations; ++i) {
+        cudaFree(dev_history[i]);
+    }
+    cudaFree(dev_history);
 }
