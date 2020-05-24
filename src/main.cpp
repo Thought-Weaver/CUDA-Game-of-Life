@@ -55,7 +55,6 @@ int main(int argc, char** argv) {
          optimized = false;
 
     // Make sure all arguments are valid and that the right number is present.
-    // TODO: With optional arguments, this makes checking the count impossible.
     check_args(argc, argv);
 
     // Parse command line arguments.
@@ -193,8 +192,16 @@ int main(int argc, char** argv) {
                        width, height, delay);
     }
 
+    // Measure the time (in ms) for computing the update for the cells.
+    int ms_elapsed = 0;
+
     // Update and print grid.
     for (int i = 0; i < iterations; ++i) {
+        // Start the clock.
+        std::chrono::steady_clock::time_point begin = 
+            std::chrono::steady_clock::now();
+        
+        // Select relevant update method.
         #if GPU
             if (!optimized) {
                 grid->naive_gpu_update(num_threads);
@@ -206,17 +213,28 @@ int main(int argc, char** argv) {
             grid->naive_cpu_update();
         #endif
 
+        // End the clock.
+        std::chrono::steady_clock::time_point end = 
+            std::chrono::steady_clock::now();
+        
+        // Add the seconds elapsed.
+        ms_elapsed += 
+            std::chrono::duration_cast<std::chrono::milliseconds>
+                (end - begin).count();
+
         if (!quiet) {
             print_cells(width, height, grid->get_cells());
         }
 
         // Write an output frame every iteration.
         if (out_filename != "") {
-            //output_frame(width, height, out_filename, grid->get_cells(), i);
             output_gif_frame(width, height, grid->get_cells(), 
                              &g, &ganim, delay);
         }
     }
+
+    // Quick print to show the user how long the main body took, ignoring I/O.
+    std::cout << "Cell updates took " << ms_elapsed << " ms!" << std::endl;
 
     // Close and write the GIF.
     if (out_filename != "") {
