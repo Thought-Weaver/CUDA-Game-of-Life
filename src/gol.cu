@@ -108,36 +108,24 @@ __global__ void optimized_update_kernel(int width, int height,
         else if (neighbors == 3 && shmem[i * width + j] == 0) {
             updated_cells[tidy * width + tidx] = 1;
         }
-        // Any other cells die.
-        else {
-            updated_cells[tidy * width + tidx] = 0;
-        }
     }
 }
 
-void call_cuda_naive_gol_update(int num_threads,
+void call_cuda_gol_update(int num_threads,
                           int width, int height,
-                          uint8_t* cells, uint8_t* updated_cells) {
+                          uint8_t* cells, uint8_t* updated_cells,
+                          bool optimized) {
     // Maybe I should fix these rather than let the user specify them?
     dim3 block_size(num_threads, num_threads);
     dim3 grid_size(int((width + num_threads - 1) / num_threads), 
                    int((height + num_threads - 1) / num_threads));
-
-    naive_update_kernel<<<grid_size, block_size>>>(width, height, 
-        cells, updated_cells);
-}
-
-void call_cuda_opt_gol_update(int num_threads,
-                          int width, int height,
-                          int iterations, 
-                          uint8_t* dev_history[]) {
-    dim3 block_size(num_threads, num_threads);
-    dim3 grid_size(int((width + num_threads - 1) / num_threads), 
-                   int((height + num_threads - 1) / num_threads));
-
-    for (int i = 0; i < iterations; ++i) {        
+    if (optimized) {
         optimized_update_kernel<<<grid_size, block_size, 
             (width * height + 4) * sizeof(uint8_t)>>>(width, height, 
-            dev_history[i], dev_history[i + 1]);
+            cells, updated_cells);
+    }
+    else {
+        naive_update_kernel<<<grid_size, block_size>>>(width, height, 
+            cells, updated_cells);
     }
 }

@@ -96,7 +96,7 @@ void run_io_tests() {
     std::cout << "puffer input: PASSED" << std::endl;
 
     // Output check, just to make sure it exists.
-    output_gif(10, 10, "test", new uint8_t* { glider }, 0);
+    output_gif(10, 10, "test", std::vector<uint8_t*> { glider });
     std::ifstream file("./gifs/test.gif");
     assert(file.good());
 
@@ -216,10 +216,12 @@ void run_grid_update_tests() {
         grid->set_cells(initial_state);
 
         // Iterates the specified number of times on the naive GPU method.
-        grid->optimized_gpu_update(test_blocks, iterations);
+        for (int i = 0; i < iterations; ++i) {
+            grid->optimized_gpu_update(test_blocks);
+        }
 
         // Make sure solution matches resulting grid.
-        assert(check_equal(width, height, grid->get_history()[iterations], solution_state));
+        assert(check_equal(width, height, grid->get_cells(), solution_state));
 
         std::cout << "OPTIMIZED GPU: PASSED" << std::endl << std::endl;
 

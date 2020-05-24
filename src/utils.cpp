@@ -31,14 +31,14 @@ void output_gif_frame(int width, int height, uint8_t* cells,
 
 /* Takes a vector of cells and outputs it into a GIF. */
 void output_gif(int width, int height, std::string filename, 
-                uint8_t* history[], int iterations) {
+                std::vector<uint8_t*> history) {
 	int delay = 100;
     GifAnim ganim;
 	GifWriter g;
 	ganim.GifBegin(&g, ("./gifs/" + filename + ".gif").c_str(), 
                    width, height, delay);
-    for (int i = 0; i <= iterations; ++i) {
-        output_gif_frame(width, height, history[i], &g, &ganim, delay);
+    for (auto& cells : history) {
+        output_gif_frame(width, height, cells, &g, &ganim, delay);
     }
 	ganim.GifEnd(&g);
 }
