@@ -73,3 +73,13 @@ print out numerous successes; if not, it will exit with an assertion error.
 -Using short-circuiting on the GoL rules to avoid unnecessary accesses.
 -Removed "all other cells die" rule in the optimized GPU version, since we
  memset to 0 before copying the data to the GPU.
+
+#-----------------------------------------------------------------------------#
+# DISCUSSION                                                                  #
+#-----------------------------------------------------------------------------#
+
+After several practical tests, I believe that shared memory is actually a worse
+option compared to global memory. Since compute compatibility >2 support, the
+benefits haven't been that great and we have memory limits with shared memory;
+global memory was able to compute a 512x512 board for 10000 iterations without
+any problem, but shared memory was unable to allocate enough memory. 
