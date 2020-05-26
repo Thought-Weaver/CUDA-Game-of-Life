@@ -6,13 +6,6 @@
 
 #include "gol.cuh"
 
-// Trying texture memory -- probably not better than just using shared memory,
-// but it's worth a shot.
-// Also, I feel like this shouldn't be global, but all the CUDA examples have
-// it as such?
-// Commenting until I figure out what's going wrong with texture mem.
-// texture<uint8_t, 2, cudaReadModeElementType> texmem;
-
 // What if I just passed the grid instead?
 __host__ __device__ uint8_t count_neighbors(int x, int y, 
                                         int width, int height, 
@@ -119,13 +112,15 @@ void call_cuda_gol_update(int num_threads,
                           int width, int height,
                           uint8_t* cells, uint8_t* updated_cells,
                           bool optimized) {
-    // Maybe I should fix these rather than let the user specify them?
+    int x_blocks = int((width + num_threads - 1) / num_threads);
+    int y_blocks = int((height + num_threads - 1) / num_threads);
+
     dim3 block_size(num_threads, num_threads);
-    dim3 grid_size(int((width + num_threads - 1) / num_threads), 
-                   int((height + num_threads - 1) / num_threads));
+    dim3 grid_size(x_blocks, y_blocks);
+
     if (optimized) {
         optimized_update_kernel<<<grid_size, block_size, 
-            (width * height + 4) * sizeof(uint8_t)>>>(width, height, 
+            (width * (height + 1)) * sizeof(uint8_t)>>>(width, height, 
             cells, updated_cells);
     }
     else {

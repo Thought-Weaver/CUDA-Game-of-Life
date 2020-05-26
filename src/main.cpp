@@ -192,15 +192,8 @@ int main(int argc, char** argv) {
                        width, height, delay);
     }
 
-    // Measure the time (in ms) for computing the update for the cells.
-    int ms_elapsed = 0;
-
     // Update and print grid.
     for (int i = 0; i < iterations; ++i) {
-        // Start the clock.
-        std::chrono::steady_clock::time_point begin = 
-            std::chrono::steady_clock::now();
-        
         // Select relevant update method.
         #if GPU
             if (!optimized) {
@@ -213,15 +206,6 @@ int main(int argc, char** argv) {
             grid->naive_cpu_update();
         #endif
 
-        // End the clock.
-        std::chrono::steady_clock::time_point end = 
-            std::chrono::steady_clock::now();
-        
-        // Add the seconds elapsed.
-        ms_elapsed += 
-            std::chrono::duration_cast<std::chrono::milliseconds>
-                (end - begin).count();
-
         if (!quiet) {
             print_cells(width, height, grid->get_cells());
         }
@@ -232,9 +216,6 @@ int main(int argc, char** argv) {
                              &g, &ganim, delay);
         }
     }
-
-    // Quick print to show the user how long the main body took, ignoring I/O.
-    std::cout << "Cell updates took " << ms_elapsed << " ms!" << std::endl;
 
     // Close and write the GIF.
     if (out_filename != "") {
