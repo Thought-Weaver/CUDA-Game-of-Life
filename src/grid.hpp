@@ -28,17 +28,17 @@ class Grid {
          */
         uint8_t* cells;
 
+        /* A 2D array of size width x height containing a 0 in index i, j if
+         * the cell is dead and a 1 if it's alive. This is the current state
+         * of the grid.
+         */
+        uint8_t* bitwise_cells;
+
         /* The width and height of the grid. */
         int width, height;
 
         /* Counts the living neighbors of a cell. */
         int count_neighbors(int x, int y);
-
-        /* Convert the current cells to a bitwise form. */
-        uint8_t* convert_to_bitwise();
-
-        /* Set current cells to converted bitwise cells in regular form. */
-        void convert_to_regular(uint8_t* bitwise_cells);
 
     public:
         /* The constructor for Grid. */
@@ -52,6 +52,12 @@ class Grid {
 
         /* Sets cells to another state of cells. */
         void set_cells(uint8_t* other_cells);
+
+        /* Convert the current cells to a bitwise form. */
+        uint8_t* convert_to_bitwise();
+
+        /* Set current cells to converted bitwise cells in regular form. */
+        uint8_t* convert_to_regular();
 
         /* Update the current cells to the next state using a naive CPU method. 
          */

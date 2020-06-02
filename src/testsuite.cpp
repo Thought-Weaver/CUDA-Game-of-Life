@@ -113,39 +113,56 @@ void run_io_tests() {
 
 /* Run a series of comprehensive tests on other Grid functions. */
 void run_other_grid_tests() {
-    uint8_t* test_state_1 = new uint8_t[3 * 4] {
+    uint8_t* test_state_1 = new uint8_t[3 * 3] {
         0, 0, 0,
         1, 0, 1,
         0, 1, 0
     };
 
-    uint8_t* test_state_2 = new uint8_t[3 * 4] {
+    uint8_t* test_state_2 = new uint8_t[3 * 3] {
         0, 1, 0,
         1, 1, 1,
         0, 1, 0
     };
 
-    Grid* grid = new Grid(3, 4, test_state_1);
+    uint8_t* test_state_3 = new uint8_t[16 * 4] {
+        0, 1, 0, 1, 0, 1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1,
+        1, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0,
+        0, 1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0,
+        0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0
+    };
+
+    Grid* grid = new Grid(3, 3, test_state_1);
 
     std::cout << "=================================" << std::endl
               << "OTHER GRID TESTS:" << std::endl
               << "=================================" << std::endl << std::endl;
 
     // Make sure get_cells works.
-    assert(check_equal(3, 4, grid->get_cells(), test_state_1));
+    assert(check_equal(3, 3, grid->get_cells(), test_state_1));
 
     std::cout << "get_cells: PASSED" << std::endl;
 
     // Make sure set_cells works.
     grid->set_cells(test_state_2);
-    assert(check_equal(3, 4, grid->get_cells(), test_state_2));
+    assert(check_equal(3, 3, grid->get_cells(), test_state_2));
 
     std::cout << "set_cells: PASSED" << std::endl << std::endl;
+
+    // Make sure that bitwise conversion works.
+    Grid* grid2 = new Grid(16, 4, test_state_3);
+    grid2->convert_to_bitwise();
+    grid2->convert_to_regular();
+    assert(check_equal(16, 4, grid2->get_cells(), test_state_3));
+
+    std::cout << "bitwise_conversion: PASSED" << std::endl << std::endl;
 
     // Free memory.
     delete[] test_state_1;
     delete[] test_state_2;
+    delete[] test_state_3;
     delete grid;
+    delete grid2;
 }
 
 /* Run a series of comprehensive tests on Grid update methods. */

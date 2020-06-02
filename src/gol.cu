@@ -136,45 +136,65 @@ __global__ void optimized_update_kernel_bitwise(int width, int height,
                     bot_mid = 0,
                     bot_right = 0;
             
+            // If there's a top-left relative to the current position.
             if (i != 0 && j != 0) {
+                // If k is 0, then we need the previous set of 8 cells, else
+                // we can just use the previous bit in the current set.
                 top_left = k == 0 ?
                     (shmem[(i - 1) * width + (j - 1)] & (1 << 7)) >> 7 :
                     (shmem[(i - 1) * width + j] & (1 << (k - 1))) >> (k - 1);
             }
 
+            // If there's a top relative to the current position.
             if (i != 0) {
                 top_mid = (shmem[(i - 1) * width + j] & (1 << k)) >> k;
             }
 
-            if (i != 0 && j != width) {
-                top_left = k == 7 ?
+            // If there's a top-right relative to the current position.
+            if (i != 0 && j != width - 1) {
+                // If k is 7, then we need the next set of 8 cells, else
+                // we can just use the next bit in the current set.
+                top_right = k == 7 ?
                     (shmem[(i - 1) * width + (j + 1)] & (1 << 0)) >> 0 :
                     (shmem[(i - 1) * width + j] & (1 << (k + 1))) >> (k + 1);
             }
 
+            // If there's a left relative to the current position.
             if (j != 0) {
+                // If k is 0, then we need the previous set of 8 cells, else
+                // we can just use the previous bit in the current set.
                 mid_left = k == 0 ?
                     (shmem[i * width + (j - 1)] & (1 << 7)) >> 7 :
                     (shmem[i * width + j] & (1 << (k - 1))) >> (k - 1);
             }
 
-            if (j != width) {
+            // If there's a right relative to the current position.
+            if (j != width - 1) {
+                // If k is 7, then we need the next set of 8 cells, else
+                // we can just use the next bit in the current set.
                 mid_right = k == 7 ?
                     (shmem[i * width + (j + 1)] & (1 << 0)) >> 0 :
                     (shmem[i * width + j] & (1 << (k + 1))) >> (k + 1);
             }
 
-            if (i != height && j != 0) {
+            // If there's a bottom-left relative to the current position.
+            if (i != height - 1 && j != 0) {
+                // If k is 0, then we need the previous set of 8 cells, else
+                // we can just use the previous bit in the current set.
                 bot_left = k == 0 ?
                     (shmem[(i + 1) * width + (j - 1)] & (1 << 7)) >> 7 :
                     (shmem[(i + 1) * width + j] & (1 << (k - 1))) >> (k - 1);
             }
 
-            if (i != height) {
+            // If there's a bottom relative to the current position.
+            if (i != height - 1) {
                 bot_mid = (shmem[(i + 1) * width + j] & (1 << k)) >> k;
             }
 
-            if (i != height && j != width) {
+            // If there's a bottom-right relative to the current position.
+            if (i != height - 1 && j != width - 1) {
+                // If k is 7, then we need the next set of 8 cells, else
+                // we can just use the next bit in the current set.
                 bot_right = k == 7 ?
                     (shmem[(i + 1) * width + (j + 1)] & (1 << 0)) >> 0 :
                     (shmem[(i + 1) * width + j] & (1 << (k + 1))) >> (k + 1);
@@ -186,15 +206,11 @@ __global__ void optimized_update_kernel_bitwise(int width, int height,
 
             // Any live cell with two or three neighbors survives.
             if ((neighbors == 2 || neighbors == 3) && current == 1) {
-                updated_cells[tidy * width + tidx] |= 1 << (7 - k);
+                updated_cells[tidy * width + tidx] |= 1 << k;
             }
             // Any dead cell with three live neighbors comes to life.
             else if (neighbors == 3 && current == 0) {
-                updated_cells[tidy * width + tidx] |= 1 << (7 - k);
-            }
-            // Any other cells die.
-            else {
-                updated_cells[tidy * width + tidx] |= 0 << (7 - k);
+                updated_cells[tidy * width + tidx] |= 1 << k;
             }
         }
     }
@@ -214,7 +230,7 @@ void call_cuda_gol_update(int num_threads,
     if (optimized) {
         if (width % 8 == 0) {
             optimized_update_kernel_bitwise<<<grid_size, block_size, 
-                (actual_width * (height + 1)) * sizeof(uint8_t)>>>(width, height, 
+                (actual_width * (height + 1)) * sizeof(uint8_t)>>>(actual_width, height, 
                 cells, updated_cells);
         }
         else {

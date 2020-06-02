@@ -97,7 +97,7 @@ int main(int argc, char** argv) {
                     std::cerr << "Error: " << e.what() << std::endl << std::endl;
 
                     std::cerr << "Usage: gpu-gol {width} {height} {iterations} "
-                            << "{num of threads per block} -o {base filename}" 
+                            << "{num of threads per block} -o {base filename} " 
                             << "{delay in hundredths of a second}"
                             << std::endl;
                 }
@@ -149,7 +149,7 @@ int main(int argc, char** argv) {
                     std::cerr << "Error: " << e.what() << std::endl << std::endl;
 
                     std::cerr << "Usage: gpu-gol {width} {height} {iterations} "
-                            << "{num of threads per block} -o {base filename}" 
+                            << "{num of threads per block} -o {base filename} " 
                             << "{delay in hundredths of a second}"
                             << std::endl;
                 }
@@ -165,7 +165,7 @@ int main(int argc, char** argv) {
     uint8_t* initial_state = new uint8_t[width * height];
     if (in_filename == "") {
         // Guarantee random generation.
-        srand (time(NULL));
+        srand(time(NULL));
         for (int i = 0; i < height; ++i) {
             for (int j = 0; j < width; ++j) {
                 initial_state[i * width + j] = rand() % 2;
@@ -189,7 +189,9 @@ int main(int argc, char** argv) {
     GifAnim ganim;
     if (out_filename != "") {
 	    ganim.GifBegin(&g, ("./gifs/" + out_filename + ".gif").c_str(), 
-                       width, height, delay);
+            width, height, delay);
+        output_gif_frame(width, height, grid->get_cells(), 
+            &g, &ganim, delay);
     }
 
     // Update and print grid.
@@ -205,6 +207,11 @@ int main(int argc, char** argv) {
         #else
             grid->naive_cpu_update();
         #endif
+
+        // Only convert back when we need to.
+        if ((!quiet || (out_filename != "")) && optimized && width % 8 == 0) {
+            grid->convert_to_regular();
+        }
 
         if (!quiet) {
             print_cells(width, height, grid->get_cells());

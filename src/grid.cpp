@@ -14,10 +14,14 @@ Grid::Grid(int w, int h, uint8_t* initial_state) {
     width = w;
     height = h;
     cells = new uint8_t[width * height];
-    for (int i = 0; i < height; ++i) {
-        for (int j = 0; j < width; ++j) {
-            cells[i * width + j] = initial_state[i * width + j];
-        }
+
+    if (width % 8 == 0) {
+        bitwise_cells = new uint8_t[(width / 8) * height];
+    }
+
+    set_cells(initial_state);
+    if (width % 8 == 0) { 
+        convert_to_bitwise();
     }
 }
 
@@ -65,33 +69,35 @@ int Grid::count_neighbors(int x, int y) {
 /* Convert the current cells to a bitwise form. */
 uint8_t* Grid::convert_to_bitwise() {
     int bitwise_width = width / 8;
-    uint8_t converted[] = new uint8_t[bitwise_width * height];
 
     for (int i = 0; i < height; ++i) {
         for (int j = 0; j < bitwise_width; ++j) {
+            bitwise_cells[i * bitwise_width + j] = 0;
             // Use bitwise operations to store 8 cells in a single position.
             for (int k = 0; k < 8; ++k) {
-                converted[i * bitwise_width + j] |= 
-                    cells[i * width + (j * 8 + k)] << (7 - k);
+                bitwise_cells[i * bitwise_width + j] |= 
+                    cells[i * width + (j * 8 + k)] << k;
             }
         }
     }
 
-    return converted;
+    return bitwise_cells;
 }
 
 /* Set current cells to converted bitwise cells in regular form. */
-void Grid::convert_to_regular(uint8_t* bitwise_cells) {
+uint8_t* Grid::convert_to_regular() {
     int bitwise_width = width / 8;
 
     for (int i = 0; i < height; ++i) {
         for (int j = 0; j < bitwise_width; ++j) {
             for (int k = 0; k < 8; ++k) {
                 cells[i * width + (j * 8 + k)] =
-                    (cells[i * bitwise_width + j] & (1 << k)) >> k;
+                    (bitwise_cells[i * bitwise_width + j] & (1 << k)) >> k;
             }
         }
     }
+
+    return cells;
 }
 
 /* Update the current cells to the next state using a naive CPU method. */
@@ -166,7 +172,7 @@ void Grid::naive_gpu_update(int blocks) {
 }
 
 /* Update the current cells to the next state using an optimized GPU method. */
-void Grid::optimized_gpu_update(int blocks) {
+void Grid::optimized_gpu_update(int num_threads) {
     uint8_t* dev_cells;
     uint8_t* dev_out_cells;
 
@@ -183,7 +189,7 @@ void Grid::optimized_gpu_update(int blocks) {
         // In this special case, we can optimize further.
         gpuErrchk(cudaMemset(dev_out_cells, 0, 
             actual_width * height * sizeof(uint8_t)));
-        gpuErrchk(cudaMemcpy(dev_cells, convert_to_bitwise(cells), 
+        gpuErrchk(cudaMemcpy(dev_cells, bitwise_cells, 
             actual_width * height * sizeof(uint8_t), cudaMemcpyHostToDevice));
     }
     else {
@@ -192,30 +198,18 @@ void Grid::optimized_gpu_update(int blocks) {
     }
 
     // Update the cells using optimized GPU method.
-    call_cuda_gol_update(blocks, 
+    call_cuda_gol_update(num_threads, 
                          width, height,
                          dev_cells, dev_out_cells, true);
     
-    uint8_t* updated_cells = new uint8_t[actual_width * height];
-
     // Copy memory back to host.
     if (width % 8 == 0) {
-        gpuErrchk(cudaMemcpy(updated_cells, dev_out_cells, 
+        gpuErrchk(cudaMemcpy(bitwise_cells, dev_out_cells, 
             actual_width * height * sizeof(uint8_t), cudaMemcpyDeviceToHost));
-
-        convert_to_regular(updated_cells);
-
-        delete[] updated_cells;
     }
     else {
-        gpuErrchk(cudaMemcpy(updated_cells, dev_out_cells, 
+        gpuErrchk(cudaMemcpy(cells, dev_out_cells, 
             actual_width * height * sizeof(uint8_t), cudaMemcpyDeviceToHost));
-
-        // Now that the next generation has been computed in updated_cells,
-        // copy that to the cells in the Grid object.
-        set_cells(updated_cells);
-        
-        delete[] updated_cells;
     }
 
     // Free memory.
