@@ -34,6 +34,12 @@ class Grid {
         /* Counts the living neighbors of a cell. */
         int count_neighbors(int x, int y);
 
+        /* Convert the current cells to a bitwise form. */
+        uint8_t* convert_to_bitwise();
+
+        /* Set current cells to converted bitwise cells in regular form. */
+        void convert_to_regular(uint8_t* bitwise_cells);
+
     public:
         /* The constructor for Grid. */
         Grid(int width, int height, uint8_t* initial_state);
