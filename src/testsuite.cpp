@@ -247,4 +247,22 @@ void run_grid_update_tests() {
         delete[] solution_state;
         delete grid;
     }
+
+    std::cout << "128x128_Random.txt TEST:" << std::endl << std::endl;
+
+    // Guarantee random generation.
+    int width = 128, height = 128;
+    uint8_t* initial_state = load_cells(width, height, "./grids/128x128_Random.txt");
+    Grid* grid = new Grid(width, height, initial_state);
+    Grid* grid2 = new Grid(width, height, initial_state);
+    grid->naive_cpu_update();
+    grid2->optimized_gpu_update(test_blocks);
+    assert(check_equal(width, height, grid->get_cells(), grid2->convert_to_regular()));
+
+    std::cout << "OPTIMIZED GPU BITWISE: PASSED" << std::endl << std::endl;
+
+    // Free memory.
+    delete[] initial_state;
+    delete grid;
+    delete grid2;
 }
