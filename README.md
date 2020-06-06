@@ -76,7 +76,7 @@ Here's an example of running the optimized GPU version on a 512x512 board and ou
 
 ## Example Output
 
-Here's an example running the program on 128x128_Random.txt in grids:
+Here's an example output GIF from running the program on 128x128_Random.txt in grids:
 
 ![Example Output](gifs/example.gif)
 
