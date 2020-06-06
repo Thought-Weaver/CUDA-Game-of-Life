@@ -91,6 +91,7 @@ uint8_t* Grid::convert_to_regular() {
     for (int i = 0; i < height; ++i) {
         for (int j = 0; j < bitwise_width; ++j) {
             for (int k = 0; k < 8; ++k) {
+                // Access the kth bit and assign it to the appropriate cell.
                 cells[i * width + (j * 8 + k)] =
                     (bitwise_cells[i * bitwise_width + j] & (1 << k)) >> k;
             }
