@@ -168,11 +168,12 @@ void run_other_grid_tests() {
 /* Run a series of comprehensive tests on Grid update methods. */
 void run_grid_update_tests() {
     // Wanted to use filesystem, but Titan doesn't have C++17. :(
-    std::string base_files[4] = {
+    std::string base_files[5] = {
         "10_10_1_Glider.txt",
         "10_10_2_Glider.txt",
         "10_10_3_Glider.txt",
-        "10_10_4_Glider.txt"
+        "10_10_4_Glider.txt",
+        "0_0_15_Empty.txt"
     };
 
     std::cout << "=================================" << std::endl

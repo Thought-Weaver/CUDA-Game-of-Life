@@ -74,6 +74,10 @@ Here's an example of running the optimized GPU version on a 512x512 board and ou
 ./bin/gpu-gol 512 512 1000 16 -opt -o random 10
 ```
 
+## Example Output
+
+![Example Output](gifs/example.gif)
+
 ## Tests
 
 You can also build the project using make test. This will create an executable called test in the bin directory. Running ./bin/test will run a series of tests on the IO and Grid class functions. If everything runs fine, the program will print out numerous successes; if not, it will exit with an assertion error.
