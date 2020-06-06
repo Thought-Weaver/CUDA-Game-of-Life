@@ -52,14 +52,18 @@ These will build a version of the project that uses the CPU implementation and G
 
 Both of these will run the Game of Life with randomly generated boards. There are other, optional parameters you can specify:
 
+```
 -f {filename} will load the input file of 0s and 1s and convert it into a cell grid.
-
+```
+```
 -o {base filename} {gif frame delay in hundredths of seconds} will generate an output GIF with the given frame delay as ./gifs/{base filename}.gif
-
+```
+```
 -q will enable quiet mode and prevent printing the cell state to the terminal.
-
+```
+```
 -opt will enable the optimized GPU mode.
-
+```
 Some example grids you can load with -f are available in the grids directory.
 
 Here's an example of running the program on the CPU with a period-3 pulsar:
