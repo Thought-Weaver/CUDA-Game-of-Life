@@ -80,6 +80,8 @@ Here's an example output GIF from running the program on 128x128_Random.txt in g
 
 ![Example Output](gifs/example.gif)
 
+When not running this in quiet mode, each frame will be output where a '#' represents a living cell and '.' represents a dead one.
+
 ## Tests
 
 You can also build the project using make test. This will create an executable called test in the bin directory. Running ./bin/test will run a series of tests on the IO and Grid class functions. If everything runs fine, the program will print out numerous successes; if not, it will exit with an assertion error.
