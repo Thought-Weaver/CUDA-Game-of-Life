@@ -18,6 +18,144 @@ bool check_equal(int width, int height, uint8_t* cells, uint8_t* other_cells) {
     return true;
 }
 
+/* CPU version of bitwise update for testing. */
+uint8_t* bitwise_update(int width, int height, uint8_t* bitwise_cells) {
+    uint8_t* updated_cells = new uint8_t[width * height] {};
+    for (int i = 0; i < height; ++i) {
+        for (int j = 0; j < width; ++j) {
+            for (int k = 0; k < 8; ++k) {
+                uint8_t current = (bitwise_cells[i * width + j] & (1 << k)) >> k;
+                uint8_t top_left = 0,
+                        top_mid = 0,
+                        top_right = 0,
+                        mid_left = 0,
+                        mid_right = 0,
+                        bot_left = 0,
+                        bot_mid = 0,
+                        bot_right = 0;
+                
+                // If there's a top-left relative to the current position.
+                if (i > 0) {
+                    // If k is 0, then we need the previous set of 8 cells, else
+                    // we can just use the previous bit in the current set.
+                    if (k == 0 && j > 0) {
+                        top_left = (bitwise_cells[(i - 1) * width + (j - 1)] & 
+                            (1 << 7)) >> 7;
+                    }
+                    else {
+                        top_left = (bitwise_cells[(i - 1) * width + j] & 
+                            (1 << (k - 1))) >> (k - 1);
+                    }
+                }
+
+                // If there's a top relative to the current position.
+                if (i > 0) {
+                    top_mid = (bitwise_cells[(i - 1) * width + j] & 
+                        (1 << k)) >> k;
+                }
+
+                // If there's a top-right relative to the current position.
+                if (i > 0) {
+                    // If k is 7, then we need the next set of 8 cells, else
+                    // we can just use the next bit in the current set.
+                    if (j < width - 1 && k == 7) {
+                        top_right = (bitwise_cells[(i - 1) * width + (j + 1)] & 
+                            (1 << 0)) >> 0;
+                    }
+                    else {
+                        top_right = (bitwise_cells[(i - 1) * width + j] & 
+                            (1 << (k + 1))) >> (k + 1);
+                    }
+                }
+
+                // If there's a left relative to the current position.
+                if (j > 0 && k == 0) {
+                    // If k is 0, then we need the previous set of 8 cells, else
+                    // we can just use the previous bit in the current set.
+                    mid_left = (bitwise_cells[i * width + (j - 1)] & 
+                        (1 << 7)) >> 7;
+                }
+                else {
+                    mid_left = (bitwise_cells[i * width + j] & 
+                        (1 << (k - 1))) >> (k - 1);
+                }
+
+                // If there's a right relative to the current position.
+                if (k == 7 && j < width - 1) {
+                    // If k is 7, then we need the next set of 8 cells, else
+                    // we can just use the next bit in the current set.
+                    mid_right = (bitwise_cells[i * width + (j + 1)] 
+                        & (1 << 0)) >> 0;
+                }
+                else {
+                    mid_right = (bitwise_cells[i * width + j] & 
+                        (1 << (k + 1))) >> (k + 1);
+                }
+
+                // If there's a bottom-left relative to the current position.
+                if (i < height - 1) {
+                    // If k is 0, then we need the previous set of 8 cells, else
+                    // we can just use the previous bit in the current set.
+                    if (k == 0 && j > 0) {
+                        bot_left = (bitwise_cells[(i + 1) * width + (j - 1)] & 
+                            (1 << 7)) >> 7;
+                    }
+                    else {
+                        bot_left = (bitwise_cells[(i + 1) * width + j] & 
+                            (1 << (k - 1))) >> (k - 1);
+                    }
+                }
+
+                // If there's a bottom relative to the current position.
+                if (i < height - 1) {
+                    bot_mid = (bitwise_cells[(i + 1) * width + j] & 
+                        (1 << k)) >> k;
+                }
+
+                // If there's a bottom-right relative to the current position.
+                if (i < height - 1) {
+                    // If k is 7, then we need the next set of 8 cells, else
+                    // we can just use the next bit in the current set.
+                    if (k == 7 && j < width - 1) {
+                        bot_right = (bitwise_cells[(i + 1) * width + (j + 1)] & 
+                            (1 << 0)) >> 0;
+                    }
+                    else {
+                        bot_right = (bitwise_cells[(i + 1) * width + j] & 
+                            (1 << (k + 1))) >> (k + 1);
+                    }
+                }
+
+                uint8_t neighbors = top_left + top_mid + top_right + 
+                                    mid_left +           mid_right + 
+                                    bot_left + bot_mid + bot_right;
+
+                // Any live cell with two or three neighbors survives.
+                if ((neighbors == 2 || neighbors == 3) && current == 1) {
+                    updated_cells[i * width + j] |= 1 << k;
+                }
+                // Any dead cell with three live neighbors comes to life.
+                else if (neighbors == 3 && current == 0) {
+                    updated_cells[i * width + j] |= 1 << k;
+                }
+            }
+        }
+    }
+
+    uint8_t* cells = new uint8_t[width * 8 * height];
+
+    for (int i = 0; i < height; ++i) {
+        for (int j = 0; j < width; ++j) {
+            for (int k = 0; k < 8; ++k) {
+                cells[i * (width * 8) + (j * 8 + k)] =
+                    (updated_cells[i * width + j] & (1 << k)) >> k;
+            }
+        }
+    }
+
+    return cells;
+}
+
 /* Run a series of comprehensive tests on IO utilities. */
 void run_io_tests() {
     uint8_t* result_1 = new uint8_t[10 * 10] {
@@ -248,16 +386,24 @@ void run_grid_update_tests() {
         delete grid;
     }
 
-    std::cout << "128x128_Random.txt TEST:" << std::endl << std::endl;
+    std::cout << "Random 256x256 Bitwise TEST:" << std::endl << std::endl;
 
+    int width = 256, height = 256;
+    uint8_t* initial_state = new uint8_t[width * height];
     // Guarantee random generation.
-    int width = 128, height = 128;
-    uint8_t* initial_state = load_cells(width, height, "./grids/128x128_Random.txt");
+    srand(time(NULL));
+    for (int i = 0; i < height; ++i) {
+        for (int j = 0; j < width; ++j) {
+            initial_state[i * width + j] = rand() % 2;
+        }
+    }
+
     Grid* grid = new Grid(width, height, initial_state);
     Grid* grid2 = new Grid(width, height, initial_state);
     grid->naive_cpu_update();
-    grid2->optimized_gpu_update(test_blocks);
+    grid2->optimized_gpu_update(test_bitwise_blocks);
     assert(check_equal(width, height, grid->get_cells(), grid2->convert_to_regular()));
+    //assert(check_equal(width, height, grid->get_cells(), bitwise_update(width / 8, height, grid2->convert_to_bitwise())));
 
     std::cout << "OPTIMIZED GPU BITWISE: PASSED" << std::endl << std::endl;
 

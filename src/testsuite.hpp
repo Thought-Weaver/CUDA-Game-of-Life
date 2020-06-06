@@ -23,6 +23,7 @@
 #include "utils.hpp"
 
 #define test_blocks 16
+#define test_bitwise_blocks 4
 
 /* Run a series of comprehensive tests on IO utilities. */
 void run_io_tests();

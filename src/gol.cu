@@ -108,15 +108,146 @@ __global__ void optimized_update_kernel(int width, int height,
     }
 }
 
-__global__ void optimized_update_kernel_bitwise(int width, int height,
-    uint8_t* cells, uint8_t* updated_cells) {
-    extern __shared__ uint8_t shmem[];
+__global__ void optimized_update_kernel_bitwise2(int width, int height, 
+                                    uint8_t* cells, uint8_t* updated_cells) {
+    const int num_threads_x = blockDim.x * gridDim.x;
+    const int num_threads_y = blockDim.y * gridDim.y;
 
+    // Thread indices.
     int tidx = blockIdx.x * blockDim.x + threadIdx.x;
     int tidy = blockIdx.y * blockDim.y + threadIdx.y;
 
-    int i = threadIdx.y;
-    int j = threadIdx.x;
+    for (; tidy < height; tidy += num_threads_y) {
+        for (; tidx < width; tidx += num_threads_x) {
+            for (int k = 0; k < 8; ++k) {
+                uint8_t current = (cells[tidy * width + tidx] & (1 << k)) >> k;
+                uint8_t top_left = 0,
+                        top_mid = 0,
+                        top_right = 0,
+                        mid_left = 0,
+                        mid_right = 0,
+                        bot_left = 0,
+                        bot_mid = 0,
+                        bot_right = 0;
+                
+                // If there's a top-left relative to the current position.
+                if (tidy > 0) {
+                    // If k is 0, then we need the previous set of 8 cells, else
+                    // we can just use the previous bit in the current set.
+                    if (k == 0 && tidx > 0) {
+                        top_left = (cells[(tidy - 1) * width + (tidx - 1)] & 
+                            (1 << 7)) >> 7;
+                    }
+                    else {
+                        top_left = (cells[(tidy - 1) * width + tidx] & 
+                            (1 << (k - 1))) >> (k - 1);
+                    }
+                }
+    
+                // If there's a top relative to the current position.
+                if (tidy > 0) {
+                    top_mid = (cells[(tidy - 1) * width + tidx] & 
+                        (1 << k)) >> k;
+                }
+    
+                // If there's a top-right relative to the current position.
+                if (tidy > 0) {
+                    // If k is 7, then we need the next set of 8 cells, else
+                    // we can just use the next bit in the current set.
+                    if (tidx < width - 1 && k == 7) {
+                        top_right = (cells[(tidy - 1) * width + (tidx + 1)] & 
+                            (1 << 0)) >> 0;
+                    }
+                    else {
+                        top_right = (cells[(tidy - 1) * width + tidx] & 
+                            (1 << (k + 1))) >> (k + 1);
+                    }
+                }
+    
+                // If there's a left relative to the current position.
+                if (tidx > 0 && k == 0) {
+                    // If k is 0, then we need the previous set of 8 cells, else
+                    // we can just use the previous bit in the current set.
+                    mid_left = (cells[tidy * width + (tidx - 1)] & 
+                        (1 << 7)) >> 7;
+                }
+                else {
+                    mid_left = (cells[tidy * width + tidx] & 
+                        (1 << (k - 1))) >> (k - 1);
+                }
+    
+                // If there's a right relative to the current position.
+                if (k == 7 && tidx < width - 1) {
+                    // If k is 7, then we need the next set of 8 cells, else
+                    // we can just use the next bit in the current set.
+                    mid_right = (cells[tidy * width + (tidx + 1)] 
+                        & (1 << 0)) >> 0;
+                }
+                else {
+                    mid_right = (cells[tidy * width + tidx] & 
+                        (1 << (k + 1))) >> (k + 1);
+                }
+    
+                // If there's a bottom-left relative to the current position.
+                if (tidy < height - 1) {
+                    // If k is 0, then we need the previous set of 8 cells, else
+                    // we can just use the previous bit in the current set.
+                    if (k == 0 && tidx > 0) {
+                        bot_left = (cells[(tidy + 1) * width + (tidx - 1)] & 
+                            (1 << 7)) >> 7;
+                    }
+                    else {
+                        bot_left = (cells[(tidy + 1) * width + tidx] & 
+                            (1 << (k - 1))) >> (k - 1);
+                    }
+                }
+    
+                // If there's a bottom relative to the current position.
+                if (tidy < height - 1) {
+                    bot_mid = (cells[(tidy + 1) * width + tidx] & 
+                        (1 << k)) >> k;
+                }
+    
+                // If there's a bottom-right relative to the current position.
+                if (tidy < height - 1) {
+                    // If k is 7, then we need the next set of 8 cells, else
+                    // we can just use the next bit in the current set.
+                    if (k == 7 && tidx < width - 1) {
+                        bot_right = (cells[(tidy + 1) * width + (tidx + 1)] & 
+                            (1 << 0)) >> 0;
+                    }
+                    else {
+                        bot_right = (cells[(tidy + 1) * width + tidx] & 
+                            (1 << (k + 1))) >> (k + 1);
+                    }
+                }
+    
+                uint8_t neighbors = top_left + top_mid + top_right + 
+                                    mid_left +           mid_right + 
+                                    bot_left + bot_mid + bot_right;
+
+                // Any live cell with two or three neighbors survives.
+                if ((neighbors == 2 || neighbors == 3) && current == 1) {
+                    updated_cells[tidy * width + tidx] |= 1 << k;
+                }
+                // Any dead cell with three live neighbors comes to life.
+                else if (neighbors == 3 && current == 0) {
+                    updated_cells[tidy * width + tidx] |= 1 << k;
+                }
+            }
+        }
+    }
+}
+
+__global__ void optimized_update_kernel_bitwise(int width, int height,
+                        uint8_t* cells, uint8_t* updated_cells) {
+    extern __shared__ uint8_t shmem[];
+
+    const int tidx = blockIdx.x * blockDim.x + threadIdx.x;
+    const int tidy = blockIdx.y * blockDim.y + threadIdx.y;
+
+    const int i = threadIdx.y;
+    const int j = threadIdx.x;
 
     if (tidx >= 0 && tidx < width && tidy >= 0 && tidy < height) {
         shmem[i * width + j] = cells[tidy * width + tidx];
@@ -249,22 +380,21 @@ void call_cuda_gol_update(int num_threads,
                           uint8_t* cells, uint8_t* updated_cells,
                           bool optimized) {
     int actual_width = width % 8 == 0 ? width / 8 : width;
-    int x_blocks = int((actual_width + num_threads - 1) / num_threads);
-    int y_blocks = int((height + num_threads - 1) / num_threads);
+    int x_blocks = (actual_width + num_threads - 1) / num_threads;
+    int y_blocks = (height + num_threads - 1) / num_threads;
 
     dim3 block_size(num_threads, num_threads);
     dim3 grid_size(x_blocks, y_blocks);
 
     if (optimized) {
         if (width % 8 == 0) {
-            optimized_update_kernel_bitwise<<<grid_size, block_size, 
-                (num_threads + 2) * (num_threads + 2)>>>(actual_width, height, 
-                cells, updated_cells);
+            optimized_update_kernel_bitwise2<<<grid_size, block_size>>>
+                (actual_width, height, cells, updated_cells);
         }
         else {
             optimized_update_kernel<<<grid_size, block_size, 
-                (num_threads + 2) * (num_threads + 2)>>>(width, height, 
-                cells, updated_cells);
+                (num_threads + 2) * (num_threads + 2) * sizeof(uint8_t)>>>
+                (width, height, cells, updated_cells);
         }
     }
     else {
