@@ -71,7 +71,7 @@ Here's an example of running the program on the CPU with a period-3 pulsar:
 Here's an example of running the optimized GPU version on a 512x512 board and outputting it to ./gifs/random.gif with a 0.1 second frame delay:
 
 ```
-./bin/gpu-gol 512 512 1000 16 -opt -o random 10
+./bin/gpu-gol 512 512 1000 16 -q -opt -o random 10
 ```
 
 ## Example Output
