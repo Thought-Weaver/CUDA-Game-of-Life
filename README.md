@@ -98,7 +98,7 @@ You can also build the project using make test. This will create an executable c
 
 ## Discussion
 
-I tested a variety of optimizations, all of which are visible in the git commit history. Texture memory, in particular, didn't turn out to be sufficiently fast to keep around. As far as I can tell, the primary bottleneck with the program is actually I/O; copying back and forth from the host to the device and so forth appears to be the largest source of delays. The greatest benefit comes from using the bitwise optimization, which reduces the amount of memory copied between the device and host.
+I tested a variety of optimizations, all of which are visible in the git commit history on Github (https://github.com/Thought-Weaver/CUDA-Game-of-Life). Texture memory, in particular, didn't turn out to be sufficiently fast to keep around. As far as I can tell, the primary bottleneck with the program is actually I/O; copying back and forth from the host to the device and so forth appears to be the largest source of delays. The greatest benefit comes from using the bitwise optimization, which reduces the amount of memory copied between the device and host.
 
 See the following brainstorming document for more discussion:
 
