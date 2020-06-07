@@ -1,4 +1,6 @@
 // Derived from Charlie Tangora's Public domain "gif.h" project.
+// Created by: https://github.com/fyngyrz
+
 // This derivation is also in the public domain.
 // -------------------------------------------------------------
 // For editing sanity: 4 spaces == 1 TAB

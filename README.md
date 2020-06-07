@@ -92,7 +92,7 @@ You can also build the project using make test. This will create an executable c
 * Used a y-dimension for block size > 1.
 * Changed from int to uint_8 which is 8 bits instead of 32.
 * Unrolled loops for counting neighbors.
-* Using short-circuiting on the GoL rules to avoid unnecessary accesses.
+* Used short-circuiting on the GoL rules to avoid unnecessary accesses.
 * Removed memset to reduce number of repeated writes to GPU memory.
 * If width is divisible by 8, updates are computed on the bitwise form instead.
 
